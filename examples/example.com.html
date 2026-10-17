@@ -1,0 +1,852 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>example.com – domain-recon report</title>
+<style>
+:root {
+  --bg: #000;
+  --line: #1f1f1f;
+  --text: #e6e6e6;
+  --muted: #8b8b8b;
+  --accent: #22c55e;
+  --high: #f87171;
+  --medium: #fb923c;
+  --low: #facc15;
+  --info: #60a5fa;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); }
+body { font: 15px/1.55 "Segoe UI", -apple-system, Roboto, Helvetica, Arial, sans-serif; }
+main { max-width: 1080px; margin: 0 auto; padding: 48px 16px 80px; }
+a { color: var(--text); }
+.mono, code, table.grid td, table.kv td { font-family: "Cascadia Mono", ui-monospace, Consolas, monospace; font-size: 13px; }
+.muted { color: var(--muted); }
+
+header .brand { color: var(--accent); font-family: ui-monospace, Consolas, monospace; font-size: 13px; letter-spacing: .08em; }
+header h1 { font-size: 40px; line-height: 1.1; margin: 8px 0 6px; word-break: break-all; }
+header .meta { color: var(--muted); font-size: 13px; }
+a.backlink { display: inline-block; margin-bottom: 20px; color: var(--muted); font-size: 13px; text-decoration: none; }
+a.backlink:hover, a.external:hover { color: var(--text); }
+a.external { color: var(--muted); font-size: 12px; }
+
+.counts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 32px 0 40px; }
+.count { border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
+.count b { display: block; font-size: 30px; line-height: 1.1; }
+.count span { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+.count.high b { color: var(--high); } .count.medium b { color: var(--medium); }
+.count.low b { color: var(--low); } .count.info b { color: var(--info); }
+
+h2 { font-size: 20px; margin: 0 0 4px; }
+section { border-top: 1px solid var(--line); padding: 28px 0; }
+section .meta { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
+
+nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+nav a { border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: 13px; text-decoration: none; color: var(--muted); }
+nav a:hover { color: var(--text); border-color: #3a3a3a; }
+
+.sev { display: inline-block; min-width: 64px; text-align: center; border-radius: 4px; padding: 1px 6px;
+       font: 600 11px/1.6 ui-monospace, Consolas, monospace; letter-spacing: .06em; text-transform: uppercase; border: 1px solid currentColor; }
+.sev-high { color: var(--high); } .sev-medium { color: var(--medium); }
+.sev-low { color: var(--low); } .sev-info { color: var(--info); }
+
+ul.findings { list-style: none; margin: 0 0 20px; padding: 0; }
+ul.findings li { display: grid; grid-template-columns: 76px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+ul.findings li:last-child { border-bottom: 0; }
+ul.findings .title { font-weight: 600; }
+ul.findings .detail { color: var(--muted); font-size: 13px; word-break: break-word; }
+ul.findings .module { color: var(--muted); font-size: 12px; text-decoration: none; }
+
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; vertical-align: top; padding: 6px 10px; border-bottom: 1px solid var(--line); word-break: break-word; }
+th { color: var(--muted); font-weight: 500; font-size: 12px; }
+table.kv > tbody > tr > th, table.kv > tr > th { width: 26%; }
+table.kv table.kv th { width: 34%; }
+table.grid th { white-space: nowrap; }
+ul.list { margin: 0; padding-left: 18px; }
+details summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+.error { border: 1px solid var(--high); color: var(--high); border-radius: 6px; padding: 10px 14px; font-size: 14px; }
+
+table.overview td { font-family: inherit; font-size: 14px; padding: 12px 10px; }
+table.overview .num { text-align: right; }
+table.overview td.num { font-family: "Cascadia Mono", ui-monospace, Consolas, monospace; font-size: 15px; }
+table.overview td.domain { white-space: nowrap; }
+table.overview td.num.high { color: var(--high); } table.overview td.num.medium { color: var(--medium); }
+table.overview td.num.low { color: var(--low); } table.overview td.num.info { color: var(--info); }
+table.overview td.num.zero { color: #4a4a4a; }
+table.overview a.domain { font-weight: 600; font-size: 15px; }
+table.overview tr:hover td { background: #0b0b0b; }
+
+footer { border-top: 1px solid var(--line); padding-top: 20px; color: var(--muted); font-size: 12px; }
+
+@media (max-width: 640px) {
+  header h1 { font-size: 28px; }
+  .counts { grid-template-columns: repeat(2, 1fr); }
+  ul.findings li { grid-template-columns: 1fr; gap: 4px; }
+}</style>
+</head>
+<body>
+<main>
+
+
+<header>
+<a class="backlink" href="index.html">← All scanned domains</a>  <div class="brand">DOMAIN-RECON // PASSIVE OSINT REPORT</div>
+  <h1>example.com</h1>
+  <div class="meta">
+    Scanned 2026-10-17 07:37 UTC
+    · 9 modules
+    · domain-recon v0.1.0
+    · <a class="external" href="https://example.com" target="_blank" rel="noopener noreferrer">https://example.com ↗</a>
+  </div>
+</header>
+
+<div class="counts">
+  <div class="count high"><b>0</b><span>high</span></div>
+  <div class="count medium"><b>5</b><span>medium</span></div>
+  <div class="count low"><b>6</b><span>low</span></div>
+  <div class="count info"><b>7</b><span>info</span></div>
+</div>
+
+<section>
+  <h2>Key findings</h2>
+  <div class="meta">All findings from all modules, most severe first.</div>
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Missing HSTS header</div>
+<div class="detail">Browsers may first connect over plain HTTP, which allows downgrade attacks.</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Missing Content-Security-Policy</div>
+<div class="detail">No browser-level limit on where scripts can load from (XSS mitigation).</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">HTTP does not redirect to HTTPS</div>
+<div class="detail">http://example.com/ stays on plain HTTP.</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Archived URLs with potentially sensitive paths (5)</div>
+<div class="detail">They may no longer be live, but can reveal backups, configs or admin panels: http://www.example.com/%80./boot.ini, http://example.com:80/%D0%9B%D0%B5%D1%87%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%BF%D1%80%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%B8%D1%82%D0%B0/wordpress/wp-admin/install.php, http://example.com:80/%D0%BB%D0%B5%D1%87%D0%B5%D0%BD%D0%B8%D0%B8%D0%B5%D0%BF%D1%80%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%B8%D1%82%D0%B0/wp-admin/install.php, http://example.com/%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0.zip, http://www.example.com/%D1%84%D0%B0%D0%B9%D0%BB.zip</div>        <a class="module" href="#wayback">Archived URLs (Wayback Machine)</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Lookalike domains that can receive email (32)</div>
+<div class="detail">Mail-enabled lookalikes can be used for phishing or to catch mistyped emails: example.co, example.sk, example.cz, example.de, example-account.com, myexample.com, examp1e.com, exampie.com, exampl3.com, xample.com, exmple.com, exampe.com ...</div>        <a class="module" href="#typosquat">Lookalike domains (typosquatting)</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">No CAA record</div>
+<div class="detail">Any certificate authority may issue certificates for this domain. A CAA record restricts issuance to the CAs the owner actually uses.</div>        <a class="module" href="#dns">DNS records</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">No DMARC aggregate reports (rua)</div>
+<div class="detail">The owner does not receive reports about who sends mail in the domain&#39;s name.</div>        <a class="module" href="#email">Email security (SPF, DKIM, DMARC)</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Missing X-Content-Type-Options</div>
+<div class="detail">Browsers may guess (&#39;sniff&#39;) content types, which can turn uploads into scripts.</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Missing Referrer-Policy</div>
+<div class="detail">Full URLs, including tokens in them, may leak to other sites via the Referer header.</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Page can be embedded in other sites (clickjacking)</div>
+<div class="detail">Neither X-Frame-Options nor CSP frame-ancestors is set.</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Registered lookalike domains: 61</div>
+<div class="detail">Not necessarily malicious: many are parked or defensive registrations by the owner. Check who owns them: example.net, example.org, example.co, example.io, example.eu, example.sk, example.cz, example.de, example-account.com, myexample.com, secure-example.com, ex4mple.com ...</div>        <a class="module" href="#typosquat">Lookalike domains (typosquatting)</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">Network owner</div>
+<div class="detail">CLOUDFLARENET - Cloudflare, Inc., US (AS13335, US)</div>        <a class="module" href="#hosting">Hosting &amp; network owner</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">Served through a CDN (Cloudflare)</div>
+<div class="detail">The real origin server IP is hidden behind the CDN.</div>        <a class="module" href="#hosting">Hosting &amp; network owner</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">No DKIM key found on common selectors</div>
+<div class="detail">Selectors can have any name, so this does not prove DKIM is missing.</div>        <a class="module" href="#email">Email security (SPF, DKIM, DMARC)</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">Issued by SSL Corporation</div>
+<div class="detail">Valid for 69 more days.</div>        <a class="module" href="#tls">TLS certificate</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">No security.txt</div>
+<div class="detail">There is no published way to report vulnerabilities (RFC 9116).</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">5 subdomains found in Certificate Transparency logs</div>
+<div class="detail">1 of the 5 checked still resolve to their own IP.</div>        <a class="module" href="#subdomains">Subdomains (Certificate Transparency)</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">5000+ unique URLs archived</div>
+<div class="detail">First capture: 2002-01-20.</div>        <a class="module" href="#wayback">Archived URLs (Wayback Machine)</a>
+      </div>
+    </li>
+  </ul>
+  <nav>
+    <a href="#dns">DNS records</a>
+    <a href="#registration">Domain registration</a>
+    <a href="#hosting">Hosting &amp; network owner</a>
+    <a href="#email">Email security (SPF, DKIM, DMARC)</a>
+    <a href="#tls">TLS certificate</a>
+    <a href="#http">Website &amp; security headers</a>
+    <a href="#subdomains">Subdomains (Certificate Transparency)</a>
+    <a href="#wayback">Archived URLs (Wayback Machine)</a>
+    <a href="#typosquat">Lookalike domains (typosquatting)</a>
+  </nav>
+</section>
+
+<section id="dns">
+  <h2>DNS records</h2>
+  <div class="meta">Source: System DNS resolver · 0.48 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">No CAA record</div>
+<div class="detail">Any certificate authority may issue certificates for this domain. A CAA record restricts issuance to the CAs the owner actually uses.</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Records</th><td>  <table class="kv">
+    <tr><th>A</th><td>    <ul class="list"><li>172.66.147.243</li><li>104.20.23.154</li></ul>
+</td></tr>
+    <tr><th>AAAA</th><td>    <ul class="list"><li>2606:4700:10::6814:179a</li><li>2606:4700:10::ac42:93f3</li></ul>
+</td></tr>
+    <tr><th>CNAME</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>MX</th><td>    <ul class="list"><li>0 .</li></ul>
+</td></tr>
+    <tr><th>NS</th><td>    <ul class="list"><li>hera.ns.cloudflare.com.</li><li>elliott.ns.cloudflare.com.</li></ul>
+</td></tr>
+    <tr><th>TXT</th><td>    <ul class="list"><li>v=spf1 -all</li><li>_k2n1y4vw3qtb4skdx9e7dxt97qrmmq9</li></ul>
+</td></tr>
+    <tr><th>SOA</th><td>    <ul class="list"><li>elliott.ns.cloudflare.com. dns.cloudflare.com. 2416374680 10000 2400 604800 1800</li></ul>
+</td></tr>
+    <tr><th>CAA</th><td><span class="muted">—</span>
+</td></tr>
+  </table>
+</td></tr>
+    <tr><th>Services from TXT</th><td><span class="muted">—</span>
+</td></tr>
+  </table>
+</section>
+<section id="registration">
+  <h2>Domain registration</h2>
+  <div class="meta">Source: RDAP via rdap.org (WHOIS fallback) · 1.13 s</div>
+
+
+
+  <table class="kv">
+    <tr><th>Registrar</th><td>RESERVED-Internet Assigned Numbers Authority</td></tr>
+    <tr><th>Created</th><td>1995-08-14T04:00:00Z</td></tr>
+    <tr><th>Expires</th><td>2027-08-13T04:00:00Z</td></tr>
+    <tr><th>Updated</th><td>2026-08-14T08:01:43Z</td></tr>
+    <tr><th>Status</th><td>    <ul class="list"><li>client delete prohibited</li><li>client transfer prohibited</li><li>client update prohibited</li></ul>
+</td></tr>
+    <tr><th>Nameservers</th><td>    <ul class="list"><li>elliott.ns.cloudflare.com</li><li>hera.ns.cloudflare.com</li></ul>
+</td></tr>
+    <tr><th>DNSSEC</th><td>yes
+</td></tr>
+    <tr><th>Source</th><td>RDAP</td></tr>
+    <tr><th>Age days</th><td>11387
+</td></tr>
+  </table>
+</section>
+<section id="hosting">
+  <h2>Hosting &amp; network owner</h2>
+  <div class="meta">Source: Team Cymru IP-to-ASN service (over DNS), reverse DNS · 1.02 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">Network owner</div>
+<div class="detail">CLOUDFLARENET - Cloudflare, Inc., US (AS13335, US)</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">Served through a CDN (Cloudflare)</div>
+<div class="detail">The real origin server IP is hidden behind the CDN.</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Hosts</th><td>    <div class="scroll"><table class="grid">
+      <tr><th>Hostname</th><th>IP</th><th>Reverse DNS</th><th>ASN</th><th>Network owner</th><th>Prefix</th><th>Country</th></tr>
+      <tr><td>example.com</td><td>104.20.23.154</td><td><span class="muted">—</span>
+</td><td>AS13335</td><td>CLOUDFLARENET - Cloudflare, Inc., US</td><td>104.20.16.0/20</td><td>US</td></tr>
+      <tr><td>example.com</td><td>172.66.147.243</td><td><span class="muted">—</span>
+</td><td>AS13335</td><td>CLOUDFLARENET - Cloudflare, Inc., US</td><td>172.66.144.0/20</td><td>US</td></tr>
+      <tr><td>example.com</td><td>2606:4700:10::ac42:93f3</td><td><span class="muted">—</span>
+</td><td>AS13335</td><td>CLOUDFLARENET - Cloudflare, Inc., US</td><td>2606:4700:10::/44</td><td>US</td></tr>
+      <tr><td>example.com</td><td>2606:4700:10::6814:179a</td><td><span class="muted">—</span>
+</td><td>AS13335</td><td>CLOUDFLARENET - Cloudflare, Inc., US</td><td>2606:4700:10::/44</td><td>US</td></tr>
+      <tr><td>www.example.com</td><td>172.66.147.243</td><td><span class="muted">—</span>
+</td><td>AS13335</td><td>CLOUDFLARENET - Cloudflare, Inc., US</td><td>172.66.144.0/20</td><td>US</td></tr>
+      <tr><td>www.example.com</td><td>104.20.23.154</td><td><span class="muted">—</span>
+</td><td>AS13335</td><td>CLOUDFLARENET - Cloudflare, Inc., US</td><td>104.20.16.0/20</td><td>US</td></tr>
+      <tr><td>www.example.com</td><td>2606:4700:10::6814:179a</td><td><span class="muted">—</span>
+</td><td>AS13335</td><td>CLOUDFLARENET - Cloudflare, Inc., US</td><td>2606:4700:10::/44</td><td>US</td></tr>
+      <tr><td>www.example.com</td><td>2606:4700:10::ac42:93f3</td><td><span class="muted">—</span>
+</td><td>AS13335</td><td>CLOUDFLARENET - Cloudflare, Inc., US</td><td>2606:4700:10::/44</td><td>US</td></tr>
+    </table></div>
+</td></tr>
+    <tr><th>Providers</th><td>    <ul class="list"><li>Cloudflare</li></ul>
+</td></tr>
+  </table>
+</section>
+<section id="email">
+  <h2>Email security (SPF, DKIM, DMARC)</h2>
+  <div class="meta">Source: DNS · 0.45 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">No DMARC aggregate reports (rua)</div>
+<div class="detail">The owner does not receive reports about who sends mail in the domain&#39;s name.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">No DKIM key found on common selectors</div>
+<div class="detail">Selectors can have any name, so this does not prove DKIM is missing.</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Spoofing risk</th><td>low</td></tr>
+    <tr><th>MX</th><td>    <ul class="list"><li>0 .</li></ul>
+</td></tr>
+    <tr><th>Providers</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>SPF</th><td>    <ul class="list"><li>v=spf1 -all</li></ul>
+</td></tr>
+    <tr><th>DMARC</th><td>    <ul class="list"><li>v=DMARC1;p=reject;sp=reject;adkim=s;aspf=s</li></ul>
+</td></tr>
+    <tr><th>DMARC policy</th><td>  <table class="kv">
+    <tr><th>V</th><td>DMARC1</td></tr>
+    <tr><th>P</th><td>reject</td></tr>
+    <tr><th>Sp</th><td>reject</td></tr>
+    <tr><th>Adkim</th><td>s</td></tr>
+    <tr><th>Aspf</th><td>s</td></tr>
+  </table>
+</td></tr>
+    <tr><th>DKIM selectors found</th><td><span class="muted">—</span>
+</td></tr>
+  </table>
+</section>
+<section id="tls">
+  <h2>TLS certificate</h2>
+  <div class="meta">Source: One TLS handshake on port 443 (same as opening the site in a browser) · 0.32 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">Issued by SSL Corporation</div>
+<div class="detail">Valid for 69 more days.</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Host</th><td>example.com</td></tr>
+    <tr><th>Trusted</th><td>yes
+</td></tr>
+    <tr><th>Protocol</th><td>TLSv1.3</td></tr>
+    <tr><th>Cipher</th><td>TLS_AES_256_GCM_SHA384</td></tr>
+    <tr><th>Subject</th><td>example.com</td></tr>
+    <tr><th>Issuer</th><td>SSL Corporation</td></tr>
+    <tr><th>Valid from</th><td>2026-09-26T22:49:11+00:00</td></tr>
+    <tr><th>Valid until</th><td>2026-12-25T22:56:35+00:00</td></tr>
+    <tr><th>Names on certificate</th><td>    <ul class="list"><li>example.com</li><li>*.example.com</li></ul>
+</td></tr>
+    <tr><th>Days left</th><td>69
+</td></tr>
+  </table>
+</section>
+<section id="http">
+  <h2>Website &amp; security headers</h2>
+  <div class="meta">Source: Homepage, /robots.txt and /.well-known/security.txt (like a normal visit) · 1.14 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Missing HSTS header</div>
+<div class="detail">Browsers may first connect over plain HTTP, which allows downgrade attacks.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Missing Content-Security-Policy</div>
+<div class="detail">No browser-level limit on where scripts can load from (XSS mitigation).</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Missing X-Content-Type-Options</div>
+<div class="detail">Browsers may guess (&#39;sniff&#39;) content types, which can turn uploads into scripts.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Missing Referrer-Policy</div>
+<div class="detail">Full URLs, including tokens in them, may leak to other sites via the Referer header.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Page can be embedded in other sites (clickjacking)</div>
+<div class="detail">Neither X-Frame-Options nor CSP frame-ancestors is set.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">HTTP does not redirect to HTTPS</div>
+<div class="detail">http://example.com/ stays on plain HTTP.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">No security.txt</div>
+<div class="detail">There is no published way to report vulnerabilities (RFC 9116).</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Final URL</th><td>https://example.com/</td></tr>
+    <tr><th>Status code</th><td>200
+</td></tr>
+    <tr><th>Redirect chain</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>Page title</th><td>Example Domain</td></tr>
+    <tr><th>HTTP redirects to HTTPS</th><td>no
+</td></tr>
+    <tr><th>Technologies</th><td>    <ul class="list"><li>Cloudflare</li></ul>
+</td></tr>
+    <tr><th>Security headers</th><td>  <table class="kv">
+    <tr><th>Strict-transport-security</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>Content-security-policy</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>X-content-type-options</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>Referrer-policy</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>X-frame-options</th><td><span class="muted">—</span>
+</td></tr>
+  </table>
+</td></tr>
+    <tr><th>Security TXT</th><td>no
+</td></tr>
+    <tr><th>Robots disallowed paths</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>All headers</th><td>  <table class="kv">
+    <tr><th>Date</th><td>Sat, 17 Oct 2026 07:37:37 GMT</td></tr>
+    <tr><th>Content-type</th><td>text/html; charset=utf-8</td></tr>
+    <tr><th>Transfer-encoding</th><td>chunked</td></tr>
+    <tr><th>Connection</th><td>keep-alive</td></tr>
+    <tr><th>Server</th><td>cloudflare</td></tr>
+    <tr><th>Last-modified</th><td>Tue, 13 Oct 2026 22:05:48 GMT</td></tr>
+    <tr><th>Allow</th><td>GET, HEAD</td></tr>
+    <tr><th>Age</th><td>13970</td></tr>
+    <tr><th>Cf-cache-status</th><td>HIT</td></tr>
+    <tr><th>Content-encoding</th><td>gzip</td></tr>
+    <tr><th>Cf-ray</th><td>a4bda3994b7e760d-FRA</td></tr>
+    <tr><th>Alt-svc</th><td>h3=&#34;:443&#34;; ma=86400</td></tr>
+  </table>
+</td></tr>
+  </table>
+</section>
+<section id="subdomains">
+  <h2>Subdomains (Certificate Transparency)</h2>
+  <div class="meta">Source: crt.sh, CertSpotter as fallback · 0.35 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">5 subdomains found in Certificate Transparency logs</div>
+<div class="detail">1 of the 5 checked still resolve to their own IP.</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Source used</th><td>crt.sh</td></tr>
+    <tr><th>Total found</th><td>5
+</td></tr>
+    <tr><th>Wildcard DNS</th><td>no
+</td></tr>
+    <tr><th>Checked in DNS</th><td>5
+</td></tr>
+    <tr><th>Live</th><td>1
+</td></tr>
+    <tr><th>Hosts</th><td>    <div class="scroll"><table class="grid">
+      <tr><th>Name</th><th>IPs</th><th>Live</th><th>Sensitive</th><th>Dangling CNAME</th></tr>
+      <tr><td>dev.example.com</td><td><span class="muted">—</span>
+</td><td>no
+</td><td>yes
+</td><td><span class="muted">—</span>
+</td></tr>
+      <tr><td>m.example.com</td><td><span class="muted">—</span>
+</td><td>no
+</td><td>no
+</td><td><span class="muted">—</span>
+</td></tr>
+      <tr><td>products.example.com</td><td><span class="muted">—</span>
+</td><td>no
+</td><td>no
+</td><td><span class="muted">—</span>
+</td></tr>
+      <tr><td>support.example.com</td><td><span class="muted">—</span>
+</td><td>no
+</td><td>no
+</td><td><span class="muted">—</span>
+</td></tr>
+      <tr><td>www.example.com</td><td>    <ul class="list"><li>172.66.147.243</li><li>104.20.23.154</li></ul>
+</td><td>yes
+</td><td>no
+</td><td><span class="muted">—</span>
+</td></tr>
+    </table></div>
+</td></tr>
+    <tr><th>Not checked</th><td><span class="muted">—</span>
+</td></tr>
+  </table>
+</section>
+<section id="wayback">
+  <h2>Archived URLs (Wayback Machine)</h2>
+  <div class="meta">Source: Internet Archive CDX API · 16.76 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">5000+ unique URLs archived</div>
+<div class="detail">First capture: 2002-01-20.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Archived URLs with potentially sensitive paths (5)</div>
+<div class="detail">They may no longer be live, but can reveal backups, configs or admin panels: http://www.example.com/%80./boot.ini, http://example.com:80/%D0%9B%D0%B5%D1%87%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%BF%D1%80%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%B8%D1%82%D0%B0/wordpress/wp-admin/install.php, http://example.com:80/%D0%BB%D0%B5%D1%87%D0%B5%D0%BD%D0%B8%D0%B8%D0%B5%D0%BF%D1%80%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%B8%D1%82%D0%B0/wp-admin/install.php, http://example.com/%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0.zip, http://www.example.com/%D1%84%D0%B0%D0%B9%D0%BB.zip</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Unique URLs</th><td>5000
+</td></tr>
+    <tr><th>Limit reached</th><td>yes
+</td></tr>
+    <tr><th>First capture</th><td>2002-01-20</td></tr>
+    <tr><th>Top file types</th><td>  <table class="kv">
+    <tr><th>Text/html</th><td>4348
+</td></tr>
+    <tr><th>Unk</th><td>496
+</td></tr>
+    <tr><th>Warc/revisit</th><td>136
+</td></tr>
+    <tr><th>Text/html,application/xhtml+xml,application/xml</th><td>17
+</td></tr>
+    <tr><th>Text/html,text/plain,text/xml,text/*,application/xml,application/xhtml+xml,application/rss+xml,application/atom+xml,application/rdf+xml,application/php,application/x-php,application/x-httpd-php</th><td>3
+</td></tr>
+  </table>
+</td></tr>
+    <tr><th>Interesting URLs</th><td>    <ul class="list"><li>http://www.example.com/%80./boot.ini</li><li>http://example.com:80/%D0%9B%D0%B5%D1%87%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%BF%D1%80%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%B8%D1%82%D0%B0/wordpress/wp-admin/install.php</li><li>http://example.com:80/%D0%BB%D0%B5%D1%87%D0%B5%D0%BD%D0%B8%D0%B8%D0%B5%D0%BF%D1%80%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%B8%D1%82%D0%B0/wp-admin/install.php</li><li>http://example.com/%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0.zip</li><li>http://www.example.com/%D1%84%D0%B0%D0%B9%D0%BB.zip</li></ul>
+</td></tr>
+  </table>
+</section>
+<section id="typosquat">
+  <h2>Lookalike domains (typosquatting)</h2>
+  <div class="meta">Source: Generated permutations, checked in DNS · 5.33 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Registered lookalike domains: 61</div>
+<div class="detail">Not necessarily malicious: many are parked or defensive registrations by the owner. Check who owns them: example.net, example.org, example.co, example.io, example.eu, example.sk, example.cz, example.de, example-account.com, myexample.com, secure-example.com, ex4mple.com ...</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Lookalike domains that can receive email (32)</div>
+<div class="detail">Mail-enabled lookalikes can be used for phishing or to catch mistyped emails: example.co, example.sk, example.cz, example.de, example-account.com, myexample.com, examp1e.com, exampie.com, exampl3.com, xample.com, exmple.com, exampe.com ...</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Generated</th><td>102
+</td></tr>
+    <tr><th>Checked</th><td>102
+</td></tr>
+    <tr><th>Registered count</th><td>61
+</td></tr>
+    <tr><th>Registered</th><td><details><summary>Show 61 items</summary>    <div class="scroll"><table class="grid">
+      <tr><th>Domain</th><th>Technique</th><th>IPs</th><th>Can receive email</th></tr>
+      <tr><td>example.net</td><td>different TLD</td><td>    <ul class="list"><li>104.20.21.8</li><li>172.66.175.59</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>example.org</td><td>different TLD</td><td>    <ul class="list"><li>172.66.157.237</li><li>104.20.26.136</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>example.co</td><td>different TLD</td><td>    <ul class="list"><li>172.67.143.199</li><li>104.21.39.76</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>example.io</td><td>different TLD</td><td><span class="muted">—</span>
+</td><td>no
+</td></tr>
+      <tr><td>example.eu</td><td>different TLD</td><td>    <ul class="list"><li>81.2.196.19</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>example.sk</td><td>different TLD</td><td>    <ul class="list"><li>81.2.241.7</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>example.cz</td><td>different TLD</td><td><span class="muted">—</span>
+</td><td>yes
+</td></tr>
+      <tr><td>example.de</td><td>different TLD</td><td>    <ul class="list"><li>217.160.0.248</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>example-account.com</td><td>added word</td><td>    <ul class="list"><li>185.118.197.123</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>myexample.com</td><td>added word</td><td>    <ul class="list"><li>199.168.103.236</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>secure-example.com</td><td>added word</td><td>    <ul class="list"><li>38.6.118.133</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>ex4mple.com</td><td>lookalike character</td><td><span class="muted">—</span>
+</td><td>no
+</td></tr>
+      <tr><td>exarnple.com</td><td>lookalike character</td><td>    <ul class="list"><li>149.120.153.85</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>examp1e.com</td><td>lookalike character</td><td><span class="muted">—</span>
+</td><td>yes
+</td></tr>
+      <tr><td>exampie.com</td><td>lookalike character</td><td>    <ul class="list"><li>103.224.182.245</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>exampl3.com</td><td>lookalike character</td><td>    <ul class="list"><li>200.69.18.139</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>xample.com</td><td>missing letter</td><td>    <ul class="list"><li>23.227.38.65</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>eample.com</td><td>missing letter</td><td>    <ul class="list"><li>13.248.169.48</li><li>76.223.54.146</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>exmple.com</td><td>missing letter</td><td>    <ul class="list"><li>67.210.233.131</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>exaple.com</td><td>missing letter</td><td>    <ul class="list"><li>104.247.81.99</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>examle.com</td><td>missing letter</td><td>    <ul class="list"><li>5.79.75.200</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>exampe.com</td><td>missing letter</td><td>    <ul class="list"><li>172.239.194.227</li><li>172.238.172.116</li><li>172.239.194.117</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>exampl.com</td><td>missing letter</td><td>    <ul class="list"><li>199.191.50.184</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>xeample.com</td><td>swapped letters</td><td><span class="muted">—</span>
+</td><td>yes
+</td></tr>
+      <tr><td>eaxmple.com</td><td>swapped letters</td><td>    <ul class="list"><li>157.7.236.66</li><li>202.181.103.212</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>exmaple.com</td><td>swapped letters</td><td>    <ul class="list"><li>104.18.75.230</li><li>104.18.74.230</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>exapmle.com</td><td>swapped letters</td><td>    <ul class="list"><li>103.224.182.243</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>examlpe.com</td><td>swapped letters</td><td>    <ul class="list"><li>13.223.25.84</li><li>54.243.117.197</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>exampel.com</td><td>swapped letters</td><td>    <ul class="list"><li>192.64.151.235</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>eexample.com</td><td>doubled letter</td><td>    <ul class="list"><li>96.38.240.54</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>exxample.com</td><td>doubled letter</td><td>    <ul class="list"><li>188.114.97.9</li><li>188.114.96.9</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>exaample.com</td><td>doubled letter</td><td><span class="muted">—</span>
+</td><td>yes
+</td></tr>
+      <tr><td>exammple.com</td><td>doubled letter</td><td>    <ul class="list"><li>13.223.25.84</li><li>54.243.117.197</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>exampple.com</td><td>doubled letter</td><td>    <ul class="list"><li>3.33.130.190</li><li>15.197.148.33</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>examplle.com</td><td>doubled letter</td><td>    <ul class="list"><li>104.21.25.153</li><li>172.67.134.87</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>examplee.com</td><td>doubled letter</td><td>    <ul class="list"><li>162.248.211.18</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>wxample.com</td><td>keyboard typo</td><td>    <ul class="list"><li>172.239.194.227</li><li>172.239.194.117</li><li>172.238.172.116</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>rxample.com</td><td>keyboard typo</td><td>    <ul class="list"><li>13.223.25.84</li><li>54.243.117.197</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>ezample.com</td><td>keyboard typo</td><td>    <ul class="list"><li>54.243.117.197</li><li>13.223.25.84</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>esample.com</td><td>keyboard typo</td><td>    <ul class="list"><li>172.67.153.222</li><li>104.21.56.168</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>edample.com</td><td>keyboard typo</td><td>    <ul class="list"><li>104.21.96.96</li><li>172.67.176.143</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>ecample.com</td><td>keyboard typo</td><td>    <ul class="list"><li>104.21.83.125</li><li>172.67.175.216</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>exsmple.com</td><td>keyboard typo</td><td>    <ul class="list"><li>54.243.117.197</li><li>13.223.25.84</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>exzmple.com</td><td>keyboard typo</td><td><span class="muted">—</span>
+</td><td>yes
+</td></tr>
+      <tr><td>exanple.com</td><td>keyboard typo</td><td>    <ul class="list"><li>172.67.128.140</li><li>104.21.1.52</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>examole.com</td><td>keyboard typo</td><td>    <ul class="list"><li>172.239.194.227</li><li>172.239.194.117</li><li>172.238.172.116</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>exampke.com</td><td>keyboard typo</td><td>    <ul class="list"><li>188.114.96.9</li><li>188.114.97.9</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>examplw.com</td><td>keyboard typo</td><td>    <ul class="list"><li>103.224.212.235</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>examplr.com</td><td>keyboard typo</td><td>    <ul class="list"><li>103.224.212.236</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>exampls.com</td><td>keyboard typo</td><td><span class="muted">—</span>
+</td><td>no
+</td></tr>
+      <tr><td>exampld.com</td><td>keyboard typo</td><td>    <ul class="list"><li>207.207.210.36</li><li>207.207.210.23</li><li>207.207.210.50</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>e-xample.com</td><td>added hyphen</td><td>    <ul class="list"><li>172.67.130.200</li><li>104.21.9.2</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>examp-le.com</td><td>added hyphen</td><td>    <ul class="list"><li>172.237.159.210</li><li>172.234.27.224</li><li>172.239.193.217</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>wexample.com</td><td>extra key</td><td>    <ul class="list"><li>151.80.23.108</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>rexample.com</td><td>extra key</td><td>    <ul class="list"><li>54.243.117.197</li><li>13.223.25.84</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>sexample.com</td><td>extra key</td><td>    <ul class="list"><li>76.223.54.146</li><li>13.248.169.48</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>dexample.com</td><td>extra key</td><td>    <ul class="list"><li>185.143.234.132</li><li>185.143.233.132</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>esxample.com</td><td>extra key</td><td><span class="muted">—</span>
+</td><td>yes
+</td></tr>
+      <tr><td>exsample.com</td><td>extra key</td><td>    <ul class="list"><li>13.248.169.48</li><li>76.223.54.146</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>exzample.com</td><td>extra key</td><td><span class="muted">—</span>
+</td><td>yes
+</td></tr>
+      <tr><td>exampole.com</td><td>extra key</td><td>    <ul class="list"><li>3.33.130.190</li><li>15.197.148.33</li></ul>
+</td><td>no
+</td></tr>
+    </table></div>
+</details></td></tr>
+  </table>
+</section>
+
+<footer>
+  Generated by domain-recon, a passive OSINT tool. All data comes from public sources
+  (DNS, Certificate Transparency logs, RDAP/WHOIS, the Internet Archive) plus the same
+  requests a normal visitor's browser makes. Verify findings before acting on them.
+</footer>
+</main>
+</body>
+</html>

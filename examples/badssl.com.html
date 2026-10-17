@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>badssl.com – domain-recon report</title>
+<style>
+:root {
+  --bg: #000;
+  --line: #1f1f1f;
+  --text: #e6e6e6;
+  --muted: #8b8b8b;
+  --accent: #22c55e;
+  --high: #f87171;
+  --medium: #fb923c;
+  --low: #facc15;
+  --info: #60a5fa;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); }
+body { font: 15px/1.55 "Segoe UI", -apple-system, Roboto, Helvetica, Arial, sans-serif; }
+main { max-width: 1080px; margin: 0 auto; padding: 48px 16px 80px; }
+a { color: var(--text); }
+.mono, code, table.grid td, table.kv td { font-family: "Cascadia Mono", ui-monospace, Consolas, monospace; font-size: 13px; }
+.muted { color: var(--muted); }
+
+header .brand { color: var(--accent); font-family: ui-monospace, Consolas, monospace; font-size: 13px; letter-spacing: .08em; }
+header h1 { font-size: 40px; line-height: 1.1; margin: 8px 0 6px; word-break: break-all; }
+header .meta { color: var(--muted); font-size: 13px; }
+a.backlink { display: inline-block; margin-bottom: 20px; color: var(--muted); font-size: 13px; text-decoration: none; }
+a.backlink:hover, a.external:hover { color: var(--text); }
+a.external { color: var(--muted); font-size: 12px; }
+
+.counts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 32px 0 40px; }
+.count { border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
+.count b { display: block; font-size: 30px; line-height: 1.1; }
+.count span { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+.count.high b { color: var(--high); } .count.medium b { color: var(--medium); }
+.count.low b { color: var(--low); } .count.info b { color: var(--info); }
+
+h2 { font-size: 20px; margin: 0 0 4px; }
+section { border-top: 1px solid var(--line); padding: 28px 0; }
+section .meta { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
+
+nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+nav a { border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: 13px; text-decoration: none; color: var(--muted); }
+nav a:hover { color: var(--text); border-color: #3a3a3a; }
+
+.sev { display: inline-block; min-width: 64px; text-align: center; border-radius: 4px; padding: 1px 6px;
+       font: 600 11px/1.6 ui-monospace, Consolas, monospace; letter-spacing: .06em; text-transform: uppercase; border: 1px solid currentColor; }
+.sev-high { color: var(--high); } .sev-medium { color: var(--medium); }
+.sev-low { color: var(--low); } .sev-info { color: var(--info); }
+
+ul.findings { list-style: none; margin: 0 0 20px; padding: 0; }
+ul.findings li { display: grid; grid-template-columns: 76px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+ul.findings li:last-child { border-bottom: 0; }
+ul.findings .title { font-weight: 600; }
+ul.findings .detail { color: var(--muted); font-size: 13px; word-break: break-word; }
+ul.findings .module { color: var(--muted); font-size: 12px; text-decoration: none; }
+
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; vertical-align: top; padding: 6px 10px; border-bottom: 1px solid var(--line); word-break: break-word; }
+th { color: var(--muted); font-weight: 500; font-size: 12px; }
+table.kv > tbody > tr > th, table.kv > tr > th { width: 26%; }
+table.kv table.kv th { width: 34%; }
+table.grid th { white-space: nowrap; }
+ul.list { margin: 0; padding-left: 18px; }
+details summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+.error { border: 1px solid var(--high); color: var(--high); border-radius: 6px; padding: 10px 14px; font-size: 14px; }
+
+table.overview td { font-family: inherit; font-size: 14px; padding: 12px 10px; }
+table.overview .num { text-align: right; }
+table.overview td.num { font-family: "Cascadia Mono", ui-monospace, Consolas, monospace; font-size: 15px; }
+table.overview td.domain { white-space: nowrap; }
+table.overview td.num.high { color: var(--high); } table.overview td.num.medium { color: var(--medium); }
+table.overview td.num.low { color: var(--low); } table.overview td.num.info { color: var(--info); }
+table.overview td.num.zero { color: #4a4a4a; }
+table.overview a.domain { font-weight: 600; font-size: 15px; }
+table.overview tr:hover td { background: #0b0b0b; }
+
+footer { border-top: 1px solid var(--line); padding-top: 20px; color: var(--muted); font-size: 12px; }
+
+@media (max-width: 640px) {
+  header h1 { font-size: 28px; }
+  .counts { grid-template-columns: repeat(2, 1fr); }
+  ul.findings li { grid-template-columns: 1fr; gap: 4px; }
+}</style>
+</head>
+<body>
+<main>
+
+
+<header>
+<a class="backlink" href="index.html">← All scanned domains</a>  <div class="brand">DOMAIN-RECON // PASSIVE OSINT REPORT</div>
+  <h1>badssl.com</h1>
+  <div class="meta">
+    Scanned 2026-10-17 07:37 UTC
+    · 9 modules
+    · domain-recon v0.1.0
+    · <a class="external" href="https://badssl.com" target="_blank" rel="noopener noreferrer">https://badssl.com ↗</a>
+  </div>
+</header>
+
+<div class="counts">
+  <div class="count high"><b>2</b><span>high</span></div>
+  <div class="count medium"><b>4</b><span>medium</span></div>
+  <div class="count low"><b>7</b><span>low</span></div>
+  <div class="count info"><b>7</b><span>info</span></div>
+</div>
+
+<section>
+  <h2>Key findings</h2>
+  <div class="meta">All findings from all modules, most severe first.</div>
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-high">high</span></div>
+      <div>
+        <div class="title">No SPF record</div>
+<div class="detail">Receiving mail servers cannot check which servers may send mail for this domain.</div>        <a class="module" href="#email">Email security (SPF, DKIM, DMARC)</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-high">high</span></div>
+      <div>
+        <div class="title">No DMARC record</div>
+<div class="detail">Receivers have no instructions for mail that fails SPF/DKIM, so the domain is easy to spoof in phishing emails.</div>        <a class="module" href="#email">Email security (SPF, DKIM, DMARC)</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Missing HSTS header</div>
+<div class="detail">Browsers may first connect over plain HTTP, which allows downgrade attacks.</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Missing Content-Security-Policy</div>
+<div class="detail">No browser-level limit on where scripts can load from (XSS mitigation).</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Archived URLs with potentially sensitive paths (6)</div>
+<div class="detail">They may no longer be live, but can reveal backups, configs or admin panels: https://badssl.com/certs/badssl.com-client.p12, https://badssl.com/certs/badssl.com-client.pem, https://expired.badssl.com/download.zip, https://expired.badssl.com/fake.git, https://wrong.host.badssl.com/fake.git, https://self-signed.badssl.com/fake.git</div>        <a class="module" href="#wayback">Archived URLs (Wayback Machine)</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Lookalike domains that can receive email (5)</div>
+<div class="detail">Mail-enabled lookalikes can be used for phishing or to catch mistyped emails: adssl.com, bdssl.com, bassl.com, badsl.com, badsal.com</div>        <a class="module" href="#typosquat">Lookalike domains (typosquatting)</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">No CAA record</div>
+<div class="detail">Any certificate authority may issue certificates for this domain. A CAA record restricts issuance to the CAs the owner actually uses.</div>        <a class="module" href="#dns">DNS records</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">DNSSEC is not enabled</div>
+<div class="detail">DNS answers for this domain are not cryptographically signed.</div>        <a class="module" href="#registration">Domain registration</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Missing X-Content-Type-Options</div>
+<div class="detail">Browsers may guess (&#39;sniff&#39;) content types, which can turn uploads into scripts.</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Missing Referrer-Policy</div>
+<div class="detail">Full URLs, including tokens in them, may leak to other sites via the Referer header.</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Page can be embedded in other sites (clickjacking)</div>
+<div class="detail">Neither X-Frame-Options nor CSP frame-ancestors is set.</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Software version disclosed in &#39;server&#39; header</div>
+<div class="detail">server: nginx/1.10.3 (Ubuntu) (helps attackers look up known vulnerabilities)</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Registered lookalike domains: 9</div>
+<div class="detail">Not necessarily malicious: many are parked or defensive registrations by the owner. Check who owns them: badssl.xyz, adssl.com, bdssl.com, bassl.com, badsl.com, badss.com, badasl.com, badsal.com, badsso.com</div>        <a class="module" href="#typosquat">Lookalike domains (typosquatting)</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">Network owner</div>
+<div class="detail">GOOGLE-CLOUD-PLATFORM - Google LLC, US (AS396982, US)</div>        <a class="module" href="#hosting">Hosting &amp; network owner</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">No DKIM key found on common selectors</div>
+<div class="detail">Selectors can have any name, so this does not prove DKIM is missing.</div>        <a class="module" href="#email">Email security (SPF, DKIM, DMARC)</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">Issued by Let&#39;s Encrypt</div>
+<div class="detail">Valid for 72 more days.</div>        <a class="module" href="#tls">TLS certificate</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">No security.txt</div>
+<div class="detail">There is no published way to report vulnerabilities (RFC 9116).</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">1 subdomain found in Certificate Transparency logs</div>
+<div class="detail">0 of the 1 checked still resolve to their own IP.</div>        <a class="module" href="#subdomains">Subdomains (Certificate Transparency)</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">Wildcard DNS is enabled</div>
+<div class="detail">Any subdomain resolves to 104.154.89.105. Hosts that only answer through the wildcard are not counted as live.</div>        <a class="module" href="#subdomains">Subdomains (Certificate Transparency)</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">1223 unique URLs archived</div>
+<div class="detail">First capture: 2015-05-02.</div>        <a class="module" href="#wayback">Archived URLs (Wayback Machine)</a>
+      </div>
+    </li>
+  </ul>
+  <nav>
+    <a href="#dns">DNS records</a>
+    <a href="#registration">Domain registration</a>
+    <a href="#hosting">Hosting &amp; network owner</a>
+    <a href="#email">Email security (SPF, DKIM, DMARC)</a>
+    <a href="#tls">TLS certificate</a>
+    <a href="#http">Website &amp; security headers</a>
+    <a href="#subdomains">Subdomains (Certificate Transparency)</a>
+    <a href="#wayback">Archived URLs (Wayback Machine)</a>
+    <a href="#typosquat">Lookalike domains (typosquatting)</a>
+  </nav>
+</section>
+
+<section id="dns">
+  <h2>DNS records</h2>
+  <div class="meta">Source: System DNS resolver · 0.4 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">No CAA record</div>
+<div class="detail">Any certificate authority may issue certificates for this domain. A CAA record restricts issuance to the CAs the owner actually uses.</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Records</th><td>  <table class="kv">
+    <tr><th>A</th><td>    <ul class="list"><li>104.154.89.105</li></ul>
+</td></tr>
+    <tr><th>AAAA</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>CNAME</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>MX</th><td>    <ul class="list"><li>10 alt1.gmr-smtp-in.l.google.com.</li><li>20 alt2.gmr-smtp-in.l.google.com.</li><li>40 alt4.gmr-smtp-in.l.google.com.</li><li>5 gmr-smtp-in.l.google.com.</li><li>30 alt3.gmr-smtp-in.l.google.com.</li></ul>
+</td></tr>
+    <tr><th>NS</th><td>    <ul class="list"><li>ns-cloud-c1.googledomains.com.</li><li>ns-cloud-c4.googledomains.com.</li><li>ns-cloud-c3.googledomains.com.</li><li>ns-cloud-c2.googledomains.com.</li></ul>
+</td></tr>
+    <tr><th>TXT</th><td>    <ul class="list"><li>_4wahjzefs6if6al9ai0ukockra7wb9c</li></ul>
+</td></tr>
+    <tr><th>SOA</th><td>    <ul class="list"><li>ns-cloud-c1.googledomains.com. cloud-dns-hostmaster.google.com. 2 21600 3600 259200 300</li></ul>
+</td></tr>
+    <tr><th>CAA</th><td><span class="muted">—</span>
+</td></tr>
+  </table>
+</td></tr>
+    <tr><th>Services from TXT</th><td><span class="muted">—</span>
+</td></tr>
+  </table>
+</section>
+<section id="registration">
+  <h2>Domain registration</h2>
+  <div class="meta">Source: RDAP via rdap.org (WHOIS fallback) · 1.09 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">DNSSEC is not enabled</div>
+<div class="detail">DNS answers for this domain are not cryptographically signed.</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Registrar</th><td>MarkMonitor Inc.</td></tr>
+    <tr><th>Created</th><td>2015-04-07T22:09:30Z</td></tr>
+    <tr><th>Expires</th><td>2027-04-07T22:09:30Z</td></tr>
+    <tr><th>Updated</th><td>2026-03-06T10:32:49Z</td></tr>
+    <tr><th>Status</th><td>    <ul class="list"><li>client delete prohibited</li><li>client transfer prohibited</li><li>client update prohibited</li></ul>
+</td></tr>
+    <tr><th>Nameservers</th><td>    <ul class="list"><li>ns-cloud-c1.googledomains.com</li><li>ns-cloud-c2.googledomains.com</li><li>ns-cloud-c3.googledomains.com</li><li>ns-cloud-c4.googledomains.com</li></ul>
+</td></tr>
+    <tr><th>DNSSEC</th><td>no
+</td></tr>
+    <tr><th>Source</th><td>RDAP</td></tr>
+    <tr><th>Age days</th><td>4210
+</td></tr>
+  </table>
+</section>
+<section id="hosting">
+  <h2>Hosting &amp; network owner</h2>
+  <div class="meta">Source: Team Cymru IP-to-ASN service (over DNS), reverse DNS · 0.53 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">Network owner</div>
+<div class="detail">GOOGLE-CLOUD-PLATFORM - Google LLC, US (AS396982, US)</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Hosts</th><td>    <div class="scroll"><table class="grid">
+      <tr><th>Hostname</th><th>IP</th><th>Reverse DNS</th><th>ASN</th><th>Network owner</th><th>Prefix</th><th>Country</th></tr>
+      <tr><td>badssl.com</td><td>104.154.89.105</td><td>105.89.154.104.bc.googleusercontent.com</td><td>AS396982</td><td>GOOGLE-CLOUD-PLATFORM - Google LLC, US</td><td>104.154.80.0/20</td><td>US</td></tr>
+      <tr><td>www.badssl.com</td><td>104.154.89.105</td><td>105.89.154.104.bc.googleusercontent.com</td><td>AS396982</td><td>GOOGLE-CLOUD-PLATFORM - Google LLC, US</td><td>104.154.80.0/20</td><td>US</td></tr>
+    </table></div>
+</td></tr>
+    <tr><th>Providers</th><td>    <ul class="list"><li>Google Cloud</li></ul>
+</td></tr>
+  </table>
+</section>
+<section id="email">
+  <h2>Email security (SPF, DKIM, DMARC)</h2>
+  <div class="meta">Source: DNS · 0.32 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-high">high</span></div>
+      <div>
+        <div class="title">No SPF record</div>
+<div class="detail">Receiving mail servers cannot check which servers may send mail for this domain.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-high">high</span></div>
+      <div>
+        <div class="title">No DMARC record</div>
+<div class="detail">Receivers have no instructions for mail that fails SPF/DKIM, so the domain is easy to spoof in phishing emails.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">No DKIM key found on common selectors</div>
+<div class="detail">Selectors can have any name, so this does not prove DKIM is missing.</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Spoofing risk</th><td>high</td></tr>
+    <tr><th>MX</th><td>    <ul class="list"><li>10 alt1.gmr-smtp-in.l.google.com.</li><li>20 alt2.gmr-smtp-in.l.google.com.</li><li>40 alt4.gmr-smtp-in.l.google.com.</li><li>5 gmr-smtp-in.l.google.com.</li><li>30 alt3.gmr-smtp-in.l.google.com.</li></ul>
+</td></tr>
+    <tr><th>Providers</th><td>    <ul class="list"><li>Google Workspace</li></ul>
+</td></tr>
+    <tr><th>SPF</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>DMARC</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>DMARC policy</th><td><span class="muted">—</span></td></tr>
+    <tr><th>DKIM selectors found</th><td><span class="muted">—</span>
+</td></tr>
+  </table>
+</section>
+<section id="tls">
+  <h2>TLS certificate</h2>
+  <div class="meta">Source: One TLS handshake on port 443 (same as opening the site in a browser) · 0.62 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">Issued by Let&#39;s Encrypt</div>
+<div class="detail">Valid for 72 more days.</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Host</th><td>badssl.com</td></tr>
+    <tr><th>Trusted</th><td>yes
+</td></tr>
+    <tr><th>Protocol</th><td>TLSv1.2</td></tr>
+    <tr><th>Cipher</th><td>ECDHE-RSA-AES128-GCM-SHA256</td></tr>
+    <tr><th>Subject</th><td>*.badssl.com</td></tr>
+    <tr><th>Issuer</th><td>Let&#39;s Encrypt</td></tr>
+    <tr><th>Valid from</th><td>2026-09-29T20:02:56+00:00</td></tr>
+    <tr><th>Valid until</th><td>2026-12-28T20:02:55+00:00</td></tr>
+    <tr><th>Names on certificate</th><td>    <ul class="list"><li>*.badssl.com</li><li>badssl.com</li></ul>
+</td></tr>
+    <tr><th>Days left</th><td>72
+</td></tr>
+  </table>
+</section>
+<section id="http">
+  <h2>Website &amp; security headers</h2>
+  <div class="meta">Source: Homepage, /robots.txt and /.well-known/security.txt (like a normal visit) · 1.88 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Missing HSTS header</div>
+<div class="detail">Browsers may first connect over plain HTTP, which allows downgrade attacks.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Missing Content-Security-Policy</div>
+<div class="detail">No browser-level limit on where scripts can load from (XSS mitigation).</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Missing X-Content-Type-Options</div>
+<div class="detail">Browsers may guess (&#39;sniff&#39;) content types, which can turn uploads into scripts.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Missing Referrer-Policy</div>
+<div class="detail">Full URLs, including tokens in them, may leak to other sites via the Referer header.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Page can be embedded in other sites (clickjacking)</div>
+<div class="detail">Neither X-Frame-Options nor CSP frame-ancestors is set.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Software version disclosed in &#39;server&#39; header</div>
+<div class="detail">server: nginx/1.10.3 (Ubuntu) (helps attackers look up known vulnerabilities)</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">No security.txt</div>
+<div class="detail">There is no published way to report vulnerabilities (RFC 9116).</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Final URL</th><td>https://badssl.com/</td></tr>
+    <tr><th>Status code</th><td>200
+</td></tr>
+    <tr><th>Redirect chain</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>Page title</th><td>badssl.com</td></tr>
+    <tr><th>HTTP redirects to HTTPS</th><td>yes
+</td></tr>
+    <tr><th>Technologies</th><td>    <ul class="list"><li>nginx/1.10.3 (Ubuntu)</li></ul>
+</td></tr>
+    <tr><th>Security headers</th><td>  <table class="kv">
+    <tr><th>Strict-transport-security</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>Content-security-policy</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>X-content-type-options</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>Referrer-policy</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>X-frame-options</th><td><span class="muted">—</span>
+</td></tr>
+  </table>
+</td></tr>
+    <tr><th>Security TXT</th><td>no
+</td></tr>
+    <tr><th>Robots disallowed paths</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>All headers</th><td>  <table class="kv">
+    <tr><th>Server</th><td>nginx/1.10.3 (Ubuntu)</td></tr>
+    <tr><th>Date</th><td>Sat, 17 Oct 2026 07:37:16 GMT</td></tr>
+    <tr><th>Content-type</th><td>text/html</td></tr>
+    <tr><th>Last-modified</th><td>Tue, 13 Oct 2026 21:00:30 GMT</td></tr>
+    <tr><th>Transfer-encoding</th><td>chunked</td></tr>
+    <tr><th>Connection</th><td>keep-alive</td></tr>
+    <tr><th>Etag</th><td>W/&#34;6ace9bee-2d99&#34;</td></tr>
+    <tr><th>Cache-control</th><td>no-store</td></tr>
+    <tr><th>Content-encoding</th><td>gzip</td></tr>
+  </table>
+</td></tr>
+  </table>
+</section>
+<section id="subdomains">
+  <h2>Subdomains (Certificate Transparency)</h2>
+  <div class="meta">Source: crt.sh, CertSpotter as fallback · 20.64 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">1 subdomain found in Certificate Transparency logs</div>
+<div class="detail">0 of the 1 checked still resolve to their own IP.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">Wildcard DNS is enabled</div>
+<div class="detail">Any subdomain resolves to 104.154.89.105. Hosts that only answer through the wildcard are not counted as live.</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Source used</th><td>CertSpotter</td></tr>
+    <tr><th>Total found</th><td>1
+</td></tr>
+    <tr><th>Wildcard DNS</th><td>    <ul class="list"><li>104.154.89.105</li></ul>
+</td></tr>
+    <tr><th>Checked in DNS</th><td>1
+</td></tr>
+    <tr><th>Live</th><td>0
+</td></tr>
+    <tr><th>Hosts</th><td>    <div class="scroll"><table class="grid">
+      <tr><th>Name</th><th>IPs</th><th>Live</th><th>Sensitive</th><th>Dangling CNAME</th></tr>
+      <tr><td>revoked.badssl.com</td><td>    <ul class="list"><li>104.154.89.105</li></ul>
+</td><td>no
+</td><td>no
+</td><td><span class="muted">—</span>
+</td></tr>
+    </table></div>
+</td></tr>
+    <tr><th>Not checked</th><td><span class="muted">—</span>
+</td></tr>
+  </table>
+</section>
+<section id="wayback">
+  <h2>Archived URLs (Wayback Machine)</h2>
+  <div class="meta">Source: Internet Archive CDX API · 2.36 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">1223 unique URLs archived</div>
+<div class="detail">First capture: 2015-05-02.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Archived URLs with potentially sensitive paths (6)</div>
+<div class="detail">They may no longer be live, but can reveal backups, configs or admin panels: https://badssl.com/certs/badssl.com-client.p12, https://badssl.com/certs/badssl.com-client.pem, https://expired.badssl.com/download.zip, https://expired.badssl.com/fake.git, https://wrong.host.badssl.com/fake.git, https://self-signed.badssl.com/fake.git</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Unique URLs</th><td>1223
+</td></tr>
+    <tr><th>Limit reached</th><td>no
+</td></tr>
+    <tr><th>First capture</th><td>2015-05-02</td></tr>
+    <tr><th>Top file types</th><td>  <table class="kv">
+    <tr><th>Text/html</th><td>765
+</td></tr>
+    <tr><th>Image/png</th><td>115
+</td></tr>
+    <tr><th>Text/css</th><td>83
+</td></tr>
+    <tr><th>Image/x-icon</th><td>82
+</td></tr>
+    <tr><th>Warc/revisit</th><td>78
+</td></tr>
+  </table>
+</td></tr>
+    <tr><th>Interesting URLs</th><td>    <ul class="list"><li>https://badssl.com/certs/badssl.com-client.p12</li><li>https://badssl.com/certs/badssl.com-client.pem</li><li>https://expired.badssl.com/download.zip</li><li>https://expired.badssl.com/fake.git</li><li>https://wrong.host.badssl.com/fake.git</li><li>https://self-signed.badssl.com/fake.git</li></ul>
+</td></tr>
+  </table>
+</section>
+<section id="typosquat">
+  <h2>Lookalike domains (typosquatting)</h2>
+  <div class="meta">Source: Generated permutations, checked in DNS · 5.06 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Registered lookalike domains: 9</div>
+<div class="detail">Not necessarily malicious: many are parked or defensive registrations by the owner. Check who owns them: badssl.xyz, adssl.com, bdssl.com, bassl.com, badsl.com, badss.com, badasl.com, badsal.com, badsso.com</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Lookalike domains that can receive email (5)</div>
+<div class="detail">Mail-enabled lookalikes can be used for phishing or to catch mistyped emails: adssl.com, bdssl.com, bassl.com, badsl.com, badsal.com</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Generated</th><td>105
+</td></tr>
+    <tr><th>Checked</th><td>105
+</td></tr>
+    <tr><th>Registered count</th><td>9
+</td></tr>
+    <tr><th>Registered</th><td>    <div class="scroll"><table class="grid">
+      <tr><th>Domain</th><th>Technique</th><th>IPs</th><th>Can receive email</th></tr>
+      <tr><td>badssl.xyz</td><td>different TLD</td><td>    <ul class="list"><li>13.248.169.48</li><li>76.223.54.146</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>adssl.com</td><td>missing letter</td><td>    <ul class="list"><li>217.76.142.172</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>bdssl.com</td><td>missing letter</td><td>    <ul class="list"><li>164.109.18.82</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>bassl.com</td><td>missing letter</td><td><span class="muted">—</span>
+</td><td>yes
+</td></tr>
+      <tr><td>badsl.com</td><td>missing letter</td><td>    <ul class="list"><li>172.237.152.158</li><li>172.238.172.237</li><li>172.237.152.229</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>badss.com</td><td>missing letter</td><td>    <ul class="list"><li>54.243.117.197</li><li>13.223.25.84</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>badasl.com</td><td>keyboard typo</td><td>    <ul class="list"><li>154.204.254.180</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>badsal.com</td><td>keyboard typo</td><td>    <ul class="list"><li>172.233.212.224</li><li>172.234.31.13</li><li>172.237.146.49</li><li>172.233.212.90</li><li>172.233.212.129</li><li>172.233.212.151</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>badsso.com</td><td>keyboard typo</td><td>    <ul class="list"><li>185.199.110.153</li><li>185.199.108.153</li><li>185.199.109.153</li><li>185.199.111.153</li></ul>
+</td><td>no
+</td></tr>
+    </table></div>
+</td></tr>
+  </table>
+</section>
+
+<footer>
+  Generated by domain-recon, a passive OSINT tool. All data comes from public sources
+  (DNS, Certificate Transparency logs, RDAP/WHOIS, the Internet Archive) plus the same
+  requests a normal visitor's browser makes. Verify findings before acting on them.
+</footer>
+</main>
+</body>
+</html>

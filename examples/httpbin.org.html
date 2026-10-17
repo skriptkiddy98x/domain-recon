@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>httpbin.org – domain-recon report</title>
+<style>
+:root {
+  --bg: #000;
+  --line: #1f1f1f;
+  --text: #e6e6e6;
+  --muted: #8b8b8b;
+  --accent: #22c55e;
+  --high: #f87171;
+  --medium: #fb923c;
+  --low: #facc15;
+  --info: #60a5fa;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); }
+body { font: 15px/1.55 "Segoe UI", -apple-system, Roboto, Helvetica, Arial, sans-serif; }
+main { max-width: 1080px; margin: 0 auto; padding: 48px 16px 80px; }
+a { color: var(--text); }
+.mono, code, table.grid td, table.kv td { font-family: "Cascadia Mono", ui-monospace, Consolas, monospace; font-size: 13px; }
+.muted { color: var(--muted); }
+
+header .brand { color: var(--accent); font-family: ui-monospace, Consolas, monospace; font-size: 13px; letter-spacing: .08em; }
+header h1 { font-size: 40px; line-height: 1.1; margin: 8px 0 6px; word-break: break-all; }
+header .meta { color: var(--muted); font-size: 13px; }
+a.backlink { display: inline-block; margin-bottom: 20px; color: var(--muted); font-size: 13px; text-decoration: none; }
+a.backlink:hover, a.external:hover { color: var(--text); }
+a.external { color: var(--muted); font-size: 12px; }
+
+.counts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 32px 0 40px; }
+.count { border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
+.count b { display: block; font-size: 30px; line-height: 1.1; }
+.count span { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+.count.high b { color: var(--high); } .count.medium b { color: var(--medium); }
+.count.low b { color: var(--low); } .count.info b { color: var(--info); }
+
+h2 { font-size: 20px; margin: 0 0 4px; }
+section { border-top: 1px solid var(--line); padding: 28px 0; }
+section .meta { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
+
+nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+nav a { border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: 13px; text-decoration: none; color: var(--muted); }
+nav a:hover { color: var(--text); border-color: #3a3a3a; }
+
+.sev { display: inline-block; min-width: 64px; text-align: center; border-radius: 4px; padding: 1px 6px;
+       font: 600 11px/1.6 ui-monospace, Consolas, monospace; letter-spacing: .06em; text-transform: uppercase; border: 1px solid currentColor; }
+.sev-high { color: var(--high); } .sev-medium { color: var(--medium); }
+.sev-low { color: var(--low); } .sev-info { color: var(--info); }
+
+ul.findings { list-style: none; margin: 0 0 20px; padding: 0; }
+ul.findings li { display: grid; grid-template-columns: 76px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+ul.findings li:last-child { border-bottom: 0; }
+ul.findings .title { font-weight: 600; }
+ul.findings .detail { color: var(--muted); font-size: 13px; word-break: break-word; }
+ul.findings .module { color: var(--muted); font-size: 12px; text-decoration: none; }
+
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; vertical-align: top; padding: 6px 10px; border-bottom: 1px solid var(--line); word-break: break-word; }
+th { color: var(--muted); font-weight: 500; font-size: 12px; }
+table.kv > tbody > tr > th, table.kv > tr > th { width: 26%; }
+table.kv table.kv th { width: 34%; }
+table.grid th { white-space: nowrap; }
+ul.list { margin: 0; padding-left: 18px; }
+details summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+.error { border: 1px solid var(--high); color: var(--high); border-radius: 6px; padding: 10px 14px; font-size: 14px; }
+
+table.overview td { font-family: inherit; font-size: 14px; padding: 12px 10px; }
+table.overview .num { text-align: right; }
+table.overview td.num { font-family: "Cascadia Mono", ui-monospace, Consolas, monospace; font-size: 15px; }
+table.overview td.domain { white-space: nowrap; }
+table.overview td.num.high { color: var(--high); } table.overview td.num.medium { color: var(--medium); }
+table.overview td.num.low { color: var(--low); } table.overview td.num.info { color: var(--info); }
+table.overview td.num.zero { color: #4a4a4a; }
+table.overview a.domain { font-weight: 600; font-size: 15px; }
+table.overview tr:hover td { background: #0b0b0b; }
+
+footer { border-top: 1px solid var(--line); padding-top: 20px; color: var(--muted); font-size: 12px; }
+
+@media (max-width: 640px) {
+  header h1 { font-size: 28px; }
+  .counts { grid-template-columns: repeat(2, 1fr); }
+  ul.findings li { grid-template-columns: 1fr; gap: 4px; }
+}</style>
+</head>
+<body>
+<main>
+
+
+<header>
+<a class="backlink" href="index.html">← All scanned domains</a>  <div class="brand">DOMAIN-RECON // PASSIVE OSINT REPORT</div>
+  <h1>httpbin.org</h1>
+  <div class="meta">
+    Scanned 2026-10-17 07:37 UTC
+    · 9 modules
+    · domain-recon v0.1.0
+    · <a class="external" href="https://httpbin.org" target="_blank" rel="noopener noreferrer">https://httpbin.org ↗</a>
+  </div>
+</header>
+
+<div class="counts">
+  <div class="count high"><b>0</b><span>high</span></div>
+  <div class="count medium"><b>5</b><span>medium</span></div>
+  <div class="count low"><b>8</b><span>low</span></div>
+  <div class="count info"><b>6</b><span>info</span></div>
+</div>
+
+<section>
+  <h2>Key findings</h2>
+  <div class="meta">All findings from all modules, most severe first.</div>
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Missing HSTS header</div>
+<div class="detail">Browsers may first connect over plain HTTP, which allows downgrade attacks.</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Missing Content-Security-Policy</div>
+<div class="detail">No browser-level limit on where scripts can load from (XSS mitigation).</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">HTTP does not redirect to HTTPS</div>
+<div class="detail">http://httpbin.org/ stays on plain HTTP.</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Archived URLs with potentially sensitive paths (7)</div>
+<div class="detail">They may no longer be live, but can reveal backups, configs or admin panels: http://httpbin.org:80/admin, http://httpbin.org:80/basic-auth/admin/1234, https://httpbin.org/basic-auth/admin/admin, http://www.httpbin.org/basic-auth/admin/adminpwd, https://httpbin.org/basic-auth/admin/secret, https://httpbin.org/basic-auth/admin/secret%5C, http://httpbin.org/debug?url=</div>        <a class="module" href="#wayback">Archived URLs (Wayback Machine)</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Lookalike domains that can receive email (1)</div>
+<div class="detail">Mail-enabled lookalikes can be used for phishing or to catch mistyped emails: httpbin.co</div>        <a class="module" href="#typosquat">Lookalike domains (typosquatting)</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">DNSSEC is not enabled</div>
+<div class="detail">DNS answers for this domain are not cryptographically signed.</div>        <a class="module" href="#registration">Domain registration</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">SPF policy is soft-fail (~all)</div>
+<div class="detail">Spoofed mail is usually still delivered, often to spam. &#39;-all&#39; is stricter.</div>        <a class="module" href="#email">Email security (SPF, DKIM, DMARC)</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">DMARC policy is &#39;quarantine&#39;</div>
+<div class="detail">Spoofed mail goes to spam. &#39;reject&#39; blocks it.</div>        <a class="module" href="#email">Email security (SPF, DKIM, DMARC)</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Missing X-Content-Type-Options</div>
+<div class="detail">Browsers may guess (&#39;sniff&#39;) content types, which can turn uploads into scripts.</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Missing Referrer-Policy</div>
+<div class="detail">Full URLs, including tokens in them, may leak to other sites via the Referer header.</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Page can be embedded in other sites (clickjacking)</div>
+<div class="detail">Neither X-Frame-Options nor CSP frame-ancestors is set.</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Software version disclosed in &#39;server&#39; header</div>
+<div class="detail">server: gunicorn/19.9.0 (helps attackers look up known vulnerabilities)</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Registered lookalike domains: 7</div>
+<div class="detail">Not necessarily malicious: many are parked or defensive registrations by the owner. Check who owns them: httpbin.com, httpbin.net, httpbin.info, httpbin.co, httpbin.io, httpbin.app, httbin.org</div>        <a class="module" href="#typosquat">Lookalike domains (typosquatting)</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">Network owner</div>
+<div class="detail">AMAZON-AES - Amazon.com, Inc., US (AS14618, US)</div>        <a class="module" href="#hosting">Hosting &amp; network owner</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">Issued by Amazon</div>
+<div class="detail">Valid for 77 more days.</div>        <a class="module" href="#tls">TLS certificate</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">No security.txt</div>
+<div class="detail">There is no published way to report vulnerabilities (RFC 9116).</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">robots.txt hides 1 paths from search engines</div>
+<div class="detail">/deny</div>        <a class="module" href="#http">Website &amp; security headers</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">5 subdomains found in Certificate Transparency logs</div>
+<div class="detail">2 of the 5 checked still resolve to their own IP.</div>        <a class="module" href="#subdomains">Subdomains (Certificate Transparency)</a>
+      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">5000+ unique URLs archived</div>
+<div class="detail">First capture: 2011-06-16.</div>        <a class="module" href="#wayback">Archived URLs (Wayback Machine)</a>
+      </div>
+    </li>
+  </ul>
+  <nav>
+    <a href="#dns">DNS records</a>
+    <a href="#registration">Domain registration</a>
+    <a href="#hosting">Hosting &amp; network owner</a>
+    <a href="#email">Email security (SPF, DKIM, DMARC)</a>
+    <a href="#tls">TLS certificate</a>
+    <a href="#http">Website &amp; security headers</a>
+    <a href="#subdomains">Subdomains (Certificate Transparency)</a>
+    <a href="#wayback">Archived URLs (Wayback Machine)</a>
+    <a href="#typosquat">Lookalike domains (typosquatting)</a>
+  </nav>
+</section>
+
+<section id="dns">
+  <h2>DNS records</h2>
+  <div class="meta">Source: System DNS resolver · 0.25 s</div>
+
+
+
+  <table class="kv">
+    <tr><th>Records</th><td>  <table class="kv">
+    <tr><th>A</th><td>    <ul class="list"><li>52.207.85.126</li><li>54.159.186.149</li><li>44.210.74.85</li><li>98.88.155.171</li><li>54.174.189.226</li><li>100.56.179.159</li><li>98.89.203.252</li><li>34.227.237.26</li></ul>
+</td></tr>
+    <tr><th>AAAA</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>CNAME</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>MX</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>NS</th><td>    <ul class="list"><li>ns-1053.awsdns-03.org.</li><li>ns-1555.awsdns-02.co.uk.</li><li>ns-173.awsdns-21.com.</li><li>ns-884.awsdns-46.net.</li></ul>
+</td></tr>
+    <tr><th>TXT</th><td>    <ul class="list"><li>v=spf1 include:%{i}._ip.%{h}._ehlo.%{d}._spf.vali.email ~all</li></ul>
+</td></tr>
+    <tr><th>SOA</th><td>    <ul class="list"><li>ns-1053.awsdns-03.org. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400</li></ul>
+</td></tr>
+    <tr><th>CAA</th><td>    <ul class="list"><li>0 iodef &#34;mailto:security@postman.com&#34;</li><li>0 issue &#34;amazon.com&#34;</li><li>0 issue &#34;letsencrypt.org&#34;</li><li>0 issuewild &#34;amazon.com&#34;</li></ul>
+</td></tr>
+  </table>
+</td></tr>
+    <tr><th>Services from TXT</th><td><span class="muted">—</span>
+</td></tr>
+  </table>
+</section>
+<section id="registration">
+  <h2>Domain registration</h2>
+  <div class="meta">Source: RDAP via rdap.org (WHOIS fallback) · 1.04 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">DNSSEC is not enabled</div>
+<div class="detail">DNS answers for this domain are not cryptographically signed.</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Registrar</th><td>Amazon Registrar, Inc.</td></tr>
+    <tr><th>Created</th><td>2011-06-12T21:57:10.346Z</td></tr>
+    <tr><th>Expires</th><td>2027-06-12T21:57:10.346Z</td></tr>
+    <tr><th>Updated</th><td>2026-08-12T05:20:42.8Z</td></tr>
+    <tr><th>Status</th><td>    <ul class="list"><li>client transfer prohibited</li></ul>
+</td></tr>
+    <tr><th>Nameservers</th><td>    <ul class="list"><li>ns-1053.awsdns-03.org</li><li>ns-1555.awsdns-02.co.uk</li><li>ns-173.awsdns-21.com</li><li>ns-884.awsdns-46.net</li></ul>
+</td></tr>
+    <tr><th>DNSSEC</th><td>no
+</td></tr>
+    <tr><th>Source</th><td>RDAP</td></tr>
+    <tr><th>Age days</th><td>5605
+</td></tr>
+  </table>
+</section>
+<section id="hosting">
+  <h2>Hosting &amp; network owner</h2>
+  <div class="meta">Source: Team Cymru IP-to-ASN service (over DNS), reverse DNS · 2.52 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">Network owner</div>
+<div class="detail">AMAZON-AES - Amazon.com, Inc., US (AS14618, US)</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Hosts</th><td>    <div class="scroll"><table class="grid">
+      <tr><th>Hostname</th><th>IP</th><th>Reverse DNS</th><th>ASN</th><th>Network owner</th><th>Prefix</th><th>Country</th></tr>
+      <tr><td>httpbin.org</td><td>98.88.155.171</td><td>ec2-98-88-155-171.compute-1.amazonaws.com</td><td>AS14618</td><td>AMAZON-AES - Amazon.com, Inc., US</td><td>98.88.0.0/13</td><td>US</td></tr>
+      <tr><td>httpbin.org</td><td>54.174.189.226</td><td>ec2-54-174-189-226.compute-1.amazonaws.com</td><td>AS14618</td><td>AMAZON-AES - Amazon.com, Inc., US</td><td>54.174.0.0/15</td><td>US</td></tr>
+      <tr><td>httpbin.org</td><td>100.56.179.159</td><td>ec2-100-56-179-159.compute-1.amazonaws.com</td><td>AS14618</td><td>AMAZON-AES - Amazon.com, Inc., US</td><td>100.48.0.0/12</td><td>US</td></tr>
+      <tr><td>httpbin.org</td><td>98.89.203.252</td><td>ec2-98-89-203-252.compute-1.amazonaws.com</td><td>AS14618</td><td>AMAZON-AES - Amazon.com, Inc., US</td><td>98.88.0.0/13</td><td>US</td></tr>
+      <tr><td>httpbin.org</td><td>34.227.237.26</td><td>ec2-34-227-237-26.compute-1.amazonaws.com</td><td>AS14618</td><td>AMAZON-AES - Amazon.com, Inc., US</td><td>34.224.0.0/12</td><td>US</td></tr>
+      <tr><td>httpbin.org</td><td>52.207.85.126</td><td>ec2-52-207-85-126.compute-1.amazonaws.com</td><td>AS14618</td><td>AMAZON-AES - Amazon.com, Inc., US</td><td>52.200.0.0/13</td><td>US</td></tr>
+      <tr><td>httpbin.org</td><td>54.159.186.149</td><td>ec2-54-159-186-149.compute-1.amazonaws.com</td><td>AS14618</td><td>AMAZON-AES - Amazon.com, Inc., US</td><td>54.156.0.0/14</td><td>US</td></tr>
+      <tr><td>httpbin.org</td><td>44.210.74.85</td><td>ec2-44-210-74-85.compute-1.amazonaws.com</td><td>AS14618</td><td>AMAZON-AES - Amazon.com, Inc., US</td><td>44.192.0.0/11</td><td>US</td></tr>
+      <tr><td>www.httpbin.org</td><td>3.225.83.162</td><td>ec2-3-225-83-162.compute-1.amazonaws.com</td><td>AS14618</td><td>AMAZON-AES - Amazon.com, Inc., US</td><td>3.224.0.0/12</td><td>US</td></tr>
+      <tr><td>www.httpbin.org</td><td>44.210.74.85</td><td>ec2-44-210-74-85.compute-1.amazonaws.com</td><td>AS14618</td><td>AMAZON-AES - Amazon.com, Inc., US</td><td>44.192.0.0/11</td><td>US</td></tr>
+      <tr><td>www.httpbin.org</td><td>52.207.85.126</td><td>ec2-52-207-85-126.compute-1.amazonaws.com</td><td>AS14618</td><td>AMAZON-AES - Amazon.com, Inc., US</td><td>52.200.0.0/13</td><td>US</td></tr>
+      <tr><td>www.httpbin.org</td><td>54.174.189.226</td><td>ec2-54-174-189-226.compute-1.amazonaws.com</td><td>AS14618</td><td>AMAZON-AES - Amazon.com, Inc., US</td><td>54.174.0.0/15</td><td>US</td></tr>
+      <tr><td>www.httpbin.org</td><td>98.88.155.171</td><td>ec2-98-88-155-171.compute-1.amazonaws.com</td><td>AS14618</td><td>AMAZON-AES - Amazon.com, Inc., US</td><td>98.88.0.0/13</td><td>US</td></tr>
+      <tr><td>www.httpbin.org</td><td>52.21.224.34</td><td>ec2-52-21-224-34.compute-1.amazonaws.com</td><td>AS14618</td><td>AMAZON-AES - Amazon.com, Inc., US</td><td>52.20.0.0/14</td><td>US</td></tr>
+      <tr><td>www.httpbin.org</td><td>54.159.186.149</td><td>ec2-54-159-186-149.compute-1.amazonaws.com</td><td>AS14618</td><td>AMAZON-AES - Amazon.com, Inc., US</td><td>54.156.0.0/14</td><td>US</td></tr>
+      <tr><td>www.httpbin.org</td><td>100.56.179.159</td><td>ec2-100-56-179-159.compute-1.amazonaws.com</td><td>AS14618</td><td>AMAZON-AES - Amazon.com, Inc., US</td><td>100.48.0.0/12</td><td>US</td></tr>
+    </table></div>
+</td></tr>
+    <tr><th>Providers</th><td>    <ul class="list"><li>Amazon Web Services</li></ul>
+</td></tr>
+  </table>
+</section>
+<section id="email">
+  <h2>Email security (SPF, DKIM, DMARC)</h2>
+  <div class="meta">Source: DNS · 0.37 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">SPF policy is soft-fail (~all)</div>
+<div class="detail">Spoofed mail is usually still delivered, often to spam. &#39;-all&#39; is stricter.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">DMARC policy is &#39;quarantine&#39;</div>
+<div class="detail">Spoofed mail goes to spam. &#39;reject&#39; blocks it.</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Spoofing risk</th><td>low</td></tr>
+    <tr><th>MX</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>Providers</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>SPF</th><td>    <ul class="list"><li>v=spf1 include:%{i}._ip.%{h}._ehlo.%{d}._spf.vali.email ~all</li></ul>
+</td></tr>
+    <tr><th>DMARC</th><td>    <ul class="list"><li>v=DMARC1; p=quarantine; pct=100; rua=mailto:dmarc_agg@vali.email</li></ul>
+</td></tr>
+    <tr><th>DMARC policy</th><td>  <table class="kv">
+    <tr><th>V</th><td>DMARC1</td></tr>
+    <tr><th>P</th><td>quarantine</td></tr>
+    <tr><th>Pct</th><td>100</td></tr>
+    <tr><th>Rua</th><td>mailto:dmarc_agg@vali.email</td></tr>
+  </table>
+</td></tr>
+    <tr><th>DKIM selectors found</th><td><span class="muted">—</span>
+</td></tr>
+  </table>
+</section>
+<section id="tls">
+  <h2>TLS certificate</h2>
+  <div class="meta">Source: One TLS handshake on port 443 (same as opening the site in a browser) · 0.45 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">Issued by Amazon</div>
+<div class="detail">Valid for 77 more days.</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Host</th><td>httpbin.org</td></tr>
+    <tr><th>Trusted</th><td>yes
+</td></tr>
+    <tr><th>Protocol</th><td>TLSv1.2</td></tr>
+    <tr><th>Cipher</th><td>ECDHE-RSA-AES128-GCM-SHA256</td></tr>
+    <tr><th>Subject</th><td>httpbin.org</td></tr>
+    <tr><th>Issuer</th><td>Amazon</td></tr>
+    <tr><th>Valid from</th><td>2026-06-19T00:00:00+00:00</td></tr>
+    <tr><th>Valid until</th><td>2027-01-02T23:59:59+00:00</td></tr>
+    <tr><th>Names on certificate</th><td>    <ul class="list"><li>httpbin.org</li><li>*.httpbin.org</li></ul>
+</td></tr>
+    <tr><th>Days left</th><td>77
+</td></tr>
+  </table>
+</section>
+<section id="http">
+  <h2>Website &amp; security headers</h2>
+  <div class="meta">Source: Homepage, /robots.txt and /.well-known/security.txt (like a normal visit) · 1.83 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Missing HSTS header</div>
+<div class="detail">Browsers may first connect over plain HTTP, which allows downgrade attacks.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Missing Content-Security-Policy</div>
+<div class="detail">No browser-level limit on where scripts can load from (XSS mitigation).</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Missing X-Content-Type-Options</div>
+<div class="detail">Browsers may guess (&#39;sniff&#39;) content types, which can turn uploads into scripts.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Missing Referrer-Policy</div>
+<div class="detail">Full URLs, including tokens in them, may leak to other sites via the Referer header.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Page can be embedded in other sites (clickjacking)</div>
+<div class="detail">Neither X-Frame-Options nor CSP frame-ancestors is set.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Software version disclosed in &#39;server&#39; header</div>
+<div class="detail">server: gunicorn/19.9.0 (helps attackers look up known vulnerabilities)</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">HTTP does not redirect to HTTPS</div>
+<div class="detail">http://httpbin.org/ stays on plain HTTP.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">No security.txt</div>
+<div class="detail">There is no published way to report vulnerabilities (RFC 9116).</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">robots.txt hides 1 paths from search engines</div>
+<div class="detail">/deny</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Final URL</th><td>https://httpbin.org/</td></tr>
+    <tr><th>Status code</th><td>200
+</td></tr>
+    <tr><th>Redirect chain</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>Page title</th><td>httpbin.org</td></tr>
+    <tr><th>HTTP redirects to HTTPS</th><td>no
+</td></tr>
+    <tr><th>Technologies</th><td>    <ul class="list"><li>gunicorn/19.9.0</li></ul>
+</td></tr>
+    <tr><th>Security headers</th><td>  <table class="kv">
+    <tr><th>Strict-transport-security</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>Content-security-policy</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>X-content-type-options</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>Referrer-policy</th><td><span class="muted">—</span>
+</td></tr>
+    <tr><th>X-frame-options</th><td><span class="muted">—</span>
+</td></tr>
+  </table>
+</td></tr>
+    <tr><th>Security TXT</th><td>no
+</td></tr>
+    <tr><th>Robots disallowed paths</th><td>    <ul class="list"><li>/deny</li></ul>
+</td></tr>
+    <tr><th>All headers</th><td>  <table class="kv">
+    <tr><th>Date</th><td>Sat, 17 Oct 2026 07:37:54 GMT</td></tr>
+    <tr><th>Content-type</th><td>text/html; charset=utf-8</td></tr>
+    <tr><th>Content-length</th><td>9593</td></tr>
+    <tr><th>Connection</th><td>keep-alive</td></tr>
+    <tr><th>Server</th><td>gunicorn/19.9.0</td></tr>
+    <tr><th>Access-control-allow-origin</th><td>*</td></tr>
+    <tr><th>Access-control-allow-credentials</th><td>true</td></tr>
+  </table>
+</td></tr>
+  </table>
+</section>
+<section id="subdomains">
+  <h2>Subdomains (Certificate Transparency)</h2>
+  <div class="meta">Source: crt.sh, CertSpotter as fallback · 16.05 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">5 subdomains found in Certificate Transparency logs</div>
+<div class="detail">2 of the 5 checked still resolve to their own IP.</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Source used</th><td>crt.sh</td></tr>
+    <tr><th>Total found</th><td>5
+</td></tr>
+    <tr><th>Wildcard DNS</th><td>no
+</td></tr>
+    <tr><th>Checked in DNS</th><td>5
+</td></tr>
+    <tr><th>Live</th><td>2
+</td></tr>
+    <tr><th>Hosts</th><td>    <div class="scroll"><table class="grid">
+      <tr><th>Name</th><th>IPs</th><th>Live</th><th>Sensitive</th><th>Dangling CNAME</th></tr>
+      <tr><td>eu.httpbin.org</td><td>    <ul class="list"><li>98.88.155.171</li><li>52.207.85.126</li><li>44.210.74.85</li><li>52.21.224.34</li><li>54.174.189.226</li><li>100.56.179.159</li><li>54.159.186.149</li><li>34.227.237.26</li></ul>
+</td><td>yes
+</td><td>no
+</td><td><span class="muted">—</span>
+</td></tr>
+      <tr><td>now.httpbin.org</td><td><span class="muted">—</span>
+</td><td>no
+</td><td>no
+</td><td><span class="muted">—</span>
+</td></tr>
+      <tr><td>staging.httpbin.org</td><td><span class="muted">—</span>
+</td><td>no
+</td><td>yes
+</td><td><span class="muted">—</span>
+</td></tr>
+      <tr><td>test.httpbin.org</td><td><span class="muted">—</span>
+</td><td>no
+</td><td>yes
+</td><td><span class="muted">—</span>
+</td></tr>
+      <tr><td>www.httpbin.org</td><td>    <ul class="list"><li>3.225.83.162</li><li>44.210.74.85</li><li>52.207.85.126</li><li>54.174.189.226</li><li>98.88.155.171</li><li>52.21.224.34</li><li>54.159.186.149</li><li>100.56.179.159</li></ul>
+</td><td>yes
+</td><td>no
+</td><td><span class="muted">—</span>
+</td></tr>
+    </table></div>
+</td></tr>
+    <tr><th>Not checked</th><td><span class="muted">—</span>
+</td></tr>
+  </table>
+</section>
+<section id="wayback">
+  <h2>Archived URLs (Wayback Machine)</h2>
+  <div class="meta">Source: Internet Archive CDX API · 2.27 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-info">info</span></div>
+      <div>
+        <div class="title">5000+ unique URLs archived</div>
+<div class="detail">First capture: 2011-06-16.</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Archived URLs with potentially sensitive paths (7)</div>
+<div class="detail">They may no longer be live, but can reveal backups, configs or admin panels: http://httpbin.org:80/admin, http://httpbin.org:80/basic-auth/admin/1234, https://httpbin.org/basic-auth/admin/admin, http://www.httpbin.org/basic-auth/admin/adminpwd, https://httpbin.org/basic-auth/admin/secret, https://httpbin.org/basic-auth/admin/secret%5C, http://httpbin.org/debug?url=</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Unique URLs</th><td>5000
+</td></tr>
+    <tr><th>Limit reached</th><td>yes
+</td></tr>
+    <tr><th>First capture</th><td>2011-06-16</td></tr>
+    <tr><th>Top file types</th><td>  <table class="kv">
+    <tr><th>Text/html</th><td>3389
+</td></tr>
+    <tr><th>Application/json</th><td>1224
+</td></tr>
+    <tr><th>Warc/revisit</th><td>233
+</td></tr>
+    <tr><th>Application/octet-stream</th><td>61
+</td></tr>
+    <tr><th>Unk</th><td>51
+</td></tr>
+  </table>
+</td></tr>
+    <tr><th>Interesting URLs</th><td>    <ul class="list"><li>http://httpbin.org:80/admin</li><li>http://httpbin.org:80/basic-auth/admin/1234</li><li>https://httpbin.org/basic-auth/admin/admin</li><li>http://www.httpbin.org/basic-auth/admin/adminpwd</li><li>https://httpbin.org/basic-auth/admin/secret</li><li>https://httpbin.org/basic-auth/admin/secret%5C</li><li>http://httpbin.org/debug?url=</li></ul>
+</td></tr>
+  </table>
+</section>
+<section id="typosquat">
+  <h2>Lookalike domains (typosquatting)</h2>
+  <div class="meta">Source: Generated permutations, checked in DNS · 5.18 s</div>
+
+
+  <ul class="findings">
+    <li>
+      <div><span class="sev sev-low">low</span></div>
+      <div>
+        <div class="title">Registered lookalike domains: 7</div>
+<div class="detail">Not necessarily malicious: many are parked or defensive registrations by the owner. Check who owns them: httpbin.com, httpbin.net, httpbin.info, httpbin.co, httpbin.io, httpbin.app, httbin.org</div>      </div>
+    </li>
+    <li>
+      <div><span class="sev sev-medium">medium</span></div>
+      <div>
+        <div class="title">Lookalike domains that can receive email (1)</div>
+<div class="detail">Mail-enabled lookalikes can be used for phishing or to catch mistyped emails: httpbin.co</div>      </div>
+    </li>
+  </ul>
+
+  <table class="kv">
+    <tr><th>Generated</th><td>104
+</td></tr>
+    <tr><th>Checked</th><td>104
+</td></tr>
+    <tr><th>Registered count</th><td>7
+</td></tr>
+    <tr><th>Registered</th><td>    <div class="scroll"><table class="grid">
+      <tr><th>Domain</th><th>Technique</th><th>IPs</th><th>Can receive email</th></tr>
+      <tr><td>httpbin.com</td><td>different TLD</td><td>    <ul class="list"><li>172.67.144.64</li><li>104.21.28.50</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>httpbin.net</td><td>different TLD</td><td>    <ul class="list"><li>76.223.54.146</li><li>13.248.169.48</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>httpbin.info</td><td>different TLD</td><td>    <ul class="list"><li>172.67.202.63</li><li>104.21.90.154</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>httpbin.co</td><td>different TLD</td><td>    <ul class="list"><li>104.21.18.182</li><li>172.67.183.27</li></ul>
+</td><td>yes
+</td></tr>
+      <tr><td>httpbin.io</td><td>different TLD</td><td>    <ul class="list"><li>44.211.11.205</li><li>52.70.33.41</li><li>3.224.228.208</li></ul>
+</td><td>no
+</td></tr>
+      <tr><td>httpbin.app</td><td>different TLD</td><td><span class="muted">—</span>
+</td><td>no
+</td></tr>
+      <tr><td>httbin.org</td><td>missing letter</td><td>    <ul class="list"><li>104.247.81.99</li></ul>
+</td><td>no
+</td></tr>
+    </table></div>
+</td></tr>
+  </table>
+</section>
+
+<footer>
+  Generated by domain-recon, a passive OSINT tool. All data comes from public sources
+  (DNS, Certificate Transparency logs, RDAP/WHOIS, the Internet Archive) plus the same
+  requests a normal visitor's browser makes. Verify findings before acting on them.
+</footer>
+</main>
+</body>
+</html>

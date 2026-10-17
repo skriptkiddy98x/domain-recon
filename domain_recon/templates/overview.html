@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ rows | length }} domains – domain-recon overview</title>
+<style>
+{% include "style.css" %}
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <div class="brand">DOMAIN-RECON // OVERVIEW</div>
+  <h1>{{ rows | length }} domains scanned</h1>
+  <div class="meta">Scanned {{ scanned_at[:16] | replace("T", " ") }} UTC · domain-recon v{{ tool_version }}</div>
+</header>
+
+<div class="counts">
+  {% for severity in ["high", "medium", "low", "info"] %}
+  <div class="count {{ severity }}"><b>{{ totals[severity] }}</b><span>{{ severity }} in total</span></div>
+  {% endfor %}
+</div>
+
+<section>
+  <h2>All domains</h2>
+  <div class="meta">Most serious first. Click a domain to open its full report.</div>
+  <div class="scroll">
+    <table class="grid overview">
+      <tr>
+        <th>Domain</th>
+        <th class="num">High</th><th class="num">Medium</th><th class="num">Low</th><th class="num">Info</th>
+        <th>Email spoofing risk</th>
+        <th>Most severe finding</th>
+      </tr>
+      {% for row in rows %}
+      <tr>
+        <td class="domain">
+          <a class="domain" href="{{ row.domain }}.html">{{ row.domain }}</a><br>
+          <a class="external" href="https://{{ row.domain }}" target="_blank" rel="noopener noreferrer">website ↗</a>
+        </td>
+        {% for severity in ["high", "medium", "low", "info"] %}
+        <td class="num {{ severity if row[severity] else 'zero' }}">{{ row[severity] }}</td>
+        {% endfor %}
+        <td>
+          {% if row.email_spoofing_risk %}<span class="sev sev-{{ row.email_spoofing_risk }}">{{ row.email_spoofing_risk }}</span>
+          {% else %}<span class="muted">—</span>{% endif %}
+        </td>
+        <td>
+          {% if row.top_finding %}{{ row.top_finding }}{% else %}<span class="muted">No findings</span>{% endif %}
+          {% if row.failed_modules %}<div class="muted">Could not complete: {{ row.failed_modules | join(", ") }}</div>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</section>
+
+{% include "footer.html" %}
+
+</main>
+</body>
+</html>

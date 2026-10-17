@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ report.domain }} – domain-recon report</title>
+<style>
+{% include "style.css" %}
+</style>
+</head>
+<body>
+<main>
+
+{% macro render_value(value) %}
+{% if value is mapping %}
+  {% if value %}
+  <table class="kv">
+    {% for key, item in value.items() %}
+    <tr><th>{{ key | humanize }}</th><td>{{ render_value(item) }}</td></tr>
+    {% endfor %}
+  </table>
+  {% else %}<span class="muted">—</span>{% endif %}
+{% elif value is string %}
+  {% if value %}{{ value }}{% else %}<span class="muted">—</span>{% endif %}
+{% elif value is sameas true %}yes
+{% elif value is sameas false %}no
+{% elif value is none %}<span class="muted">—</span>
+{% elif value is iterable %}
+  {% if not value %}<span class="muted">—</span>
+  {% else %}
+    {% set long = value | length > 20 %}
+    {% if long %}<details><summary>Show {{ value | length }} items</summary>{% endif %}
+    {% if value[0] is mapping %}
+    <div class="scroll"><table class="grid">
+      <tr>{% for key in value[0].keys() %}<th>{{ key | humanize }}</th>{% endfor %}</tr>
+      {% for row in value %}
+      <tr>{% for key in value[0].keys() %}<td>{{ render_value(row.get(key)) }}</td>{% endfor %}</tr>
+      {% endfor %}
+    </table></div>
+    {% else %}
+    <ul class="list">{% for item in value %}<li>{{ render_value(item) }}</li>{% endfor %}</ul>
+    {% endif %}
+    {% if long %}</details>{% endif %}
+  {% endif %}
+{% else %}{{ value }}
+{% endif %}
+{% endmacro %}
+
+<header>
+  {% if overview_href %}<a class="backlink" href="{{ overview_href }}">← All scanned domains</a>{% endif %}
+  <div class="brand">DOMAIN-RECON // PASSIVE OSINT REPORT</div>
+  <h1>{{ report.domain }}</h1>
+  <div class="meta">
+    Scanned {{ report.started_at[:16] | replace("T", " ") }} UTC
+    · {{ report.results | length }} modules
+    · domain-recon v{{ report.tool_version }}
+    · <a class="external" href="https://{{ report.domain }}" target="_blank" rel="noopener noreferrer">https://{{ report.domain }} ↗</a>
+  </div>
+</header>
+
+{% set counts = report.severity_counts() %}
+<div class="counts">
+  {% for severity in ["high", "medium", "low", "info"] %}
+  <div class="count {{ severity }}"><b>{{ counts[severity] }}</b><span>{{ severity }}</span></div>
+  {% endfor %}
+</div>
+
+<section>
+  <h2>Key findings</h2>
+  <div class="meta">All findings from all modules, most severe first.</div>
+  <ul class="findings">
+    {% for result, finding in report.sorted_findings() %}
+    <li>
+      <div><span class="sev sev-{{ finding.severity }}">{{ finding.severity }}</span></div>
+      <div>
+        <div class="title">{{ finding.title }}</div>
+        {% if finding.detail %}<div class="detail">{{ finding.detail }}</div>{% endif %}
+        <a class="module" href="#{{ result.module }}">{{ result.title }}</a>
+      </div>
+    </li>
+    {% else %}
+    <li><div></div><div class="muted">No findings.</div></li>
+    {% endfor %}
+  </ul>
+  <nav>
+    {% for result in report.results %}
+    <a href="#{{ result.module }}">{{ result.title }}</a>
+    {% endfor %}
+  </nav>
+</section>
+
+{% for result in report.results %}
+<section id="{{ result.module }}">
+  <h2>{{ result.title }}</h2>
+  <div class="meta">Source: {{ result.source }} · {{ result.duration_seconds }} s</div>
+
+  {% if result.error %}
+  <div class="error">Could not complete this module: {{ result.error }}</div>
+  {% endif %}
+
+  {% if result.findings %}
+  <ul class="findings">
+    {% for finding in result.findings %}
+    <li>
+      <div><span class="sev sev-{{ finding.severity }}">{{ finding.severity }}</span></div>
+      <div>
+        <div class="title">{{ finding.title }}</div>
+        {% if finding.detail %}<div class="detail">{{ finding.detail }}</div>{% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if result.data %}{{ render_value(result.data) }}{% endif %}
+</section>
+{% endfor %}
+
+{% include "footer.html" %}
+
+</main>
+</body>
+</html>

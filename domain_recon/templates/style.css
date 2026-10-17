@@ -1,0 +1,81 @@
+:root {
+  --bg: #000;
+  --line: #1f1f1f;
+  --text: #e6e6e6;
+  --muted: #8b8b8b;
+  --accent: #22c55e;
+  --high: #f87171;
+  --medium: #fb923c;
+  --low: #facc15;
+  --info: #60a5fa;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); }
+body { font: 15px/1.55 "Segoe UI", -apple-system, Roboto, Helvetica, Arial, sans-serif; }
+main { max-width: 1080px; margin: 0 auto; padding: 48px 16px 80px; }
+a { color: var(--text); }
+.mono, code, table.grid td, table.kv td { font-family: "Cascadia Mono", ui-monospace, Consolas, monospace; font-size: 13px; }
+.muted { color: var(--muted); }
+
+header .brand { color: var(--accent); font-family: ui-monospace, Consolas, monospace; font-size: 13px; letter-spacing: .08em; }
+header h1 { font-size: 40px; line-height: 1.1; margin: 8px 0 6px; word-break: break-all; }
+header .meta { color: var(--muted); font-size: 13px; }
+a.backlink { display: inline-block; margin-bottom: 20px; color: var(--muted); font-size: 13px; text-decoration: none; }
+a.backlink:hover, a.external:hover { color: var(--text); }
+a.external { color: var(--muted); font-size: 12px; }
+
+.counts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 32px 0 40px; }
+.count { border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
+.count b { display: block; font-size: 30px; line-height: 1.1; }
+.count span { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+.count.high b { color: var(--high); } .count.medium b { color: var(--medium); }
+.count.low b { color: var(--low); } .count.info b { color: var(--info); }
+
+h2 { font-size: 20px; margin: 0 0 4px; }
+section { border-top: 1px solid var(--line); padding: 28px 0; }
+section .meta { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
+
+nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+nav a { border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: 13px; text-decoration: none; color: var(--muted); }
+nav a:hover { color: var(--text); border-color: #3a3a3a; }
+
+.sev { display: inline-block; min-width: 64px; text-align: center; border-radius: 4px; padding: 1px 6px;
+       font: 600 11px/1.6 ui-monospace, Consolas, monospace; letter-spacing: .06em; text-transform: uppercase; border: 1px solid currentColor; }
+.sev-high { color: var(--high); } .sev-medium { color: var(--medium); }
+.sev-low { color: var(--low); } .sev-info { color: var(--info); }
+
+ul.findings { list-style: none; margin: 0 0 20px; padding: 0; }
+ul.findings li { display: grid; grid-template-columns: 76px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+ul.findings li:last-child { border-bottom: 0; }
+ul.findings .title { font-weight: 600; }
+ul.findings .detail { color: var(--muted); font-size: 13px; word-break: break-word; }
+ul.findings .module { color: var(--muted); font-size: 12px; text-decoration: none; }
+
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; vertical-align: top; padding: 6px 10px; border-bottom: 1px solid var(--line); word-break: break-word; }
+th { color: var(--muted); font-weight: 500; font-size: 12px; }
+table.kv > tbody > tr > th, table.kv > tr > th { width: 26%; }
+table.kv table.kv th { width: 34%; }
+table.grid th { white-space: nowrap; }
+ul.list { margin: 0; padding-left: 18px; }
+details summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+.error { border: 1px solid var(--high); color: var(--high); border-radius: 6px; padding: 10px 14px; font-size: 14px; }
+
+table.overview td { font-family: inherit; font-size: 14px; padding: 12px 10px; }
+table.overview .num { text-align: right; }
+table.overview td.num { font-family: "Cascadia Mono", ui-monospace, Consolas, monospace; font-size: 15px; }
+table.overview td.domain { white-space: nowrap; }
+table.overview td.num.high { color: var(--high); } table.overview td.num.medium { color: var(--medium); }
+table.overview td.num.low { color: var(--low); } table.overview td.num.info { color: var(--info); }
+table.overview td.num.zero { color: #4a4a4a; }
+table.overview a.domain { font-weight: 600; font-size: 15px; }
+table.overview tr:hover td { background: #0b0b0b; }
+
+footer { border-top: 1px solid var(--line); padding-top: 20px; color: var(--muted); font-size: 12px; }
+
+@media (max-width: 640px) {
+  header h1 { font-size: 28px; }
+  .counts { grid-template-columns: repeat(2, 1fr); }
+  ul.findings li { grid-template-columns: 1fr; gap: 4px; }
+}

@@ -1,0 +1,950 @@
+{
+  "domain": "example.com",
+  "started_at": "2026-10-17T07:37:35+00:00",
+  "finished_at": "2026-10-17T07:37:52+00:00",
+  "tool_version": "0.1.0",
+  "results": [
+    {
+      "module": "dns",
+      "title": "DNS records",
+      "source": "System DNS resolver",
+      "data": {
+        "records": {
+          "A": [
+            "172.66.147.243",
+            "104.20.23.154"
+          ],
+          "AAAA": [
+            "2606:4700:10::6814:179a",
+            "2606:4700:10::ac42:93f3"
+          ],
+          "CNAME": [],
+          "MX": [
+            "0 ."
+          ],
+          "NS": [
+            "hera.ns.cloudflare.com.",
+            "elliott.ns.cloudflare.com."
+          ],
+          "TXT": [
+            "v=spf1 -all",
+            "_k2n1y4vw3qtb4skdx9e7dxt97qrmmq9"
+          ],
+          "SOA": [
+            "elliott.ns.cloudflare.com. dns.cloudflare.com. 2416374680 10000 2400 604800 1800"
+          ],
+          "CAA": []
+        },
+        "services_from_txt": []
+      },
+      "findings": [
+        {
+          "severity": "low",
+          "title": "No CAA record",
+          "detail": "Any certificate authority may issue certificates for this domain. A CAA record restricts issuance to the CAs the owner actually uses."
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.48
+    },
+    {
+      "module": "registration",
+      "title": "Domain registration",
+      "source": "RDAP via rdap.org (WHOIS fallback)",
+      "data": {
+        "registrar": "RESERVED-Internet Assigned Numbers Authority",
+        "created": "1995-08-14T04:00:00Z",
+        "expires": "2027-08-13T04:00:00Z",
+        "updated": "2026-08-14T08:01:43Z",
+        "status": [
+          "client delete prohibited",
+          "client transfer prohibited",
+          "client update prohibited"
+        ],
+        "nameservers": [
+          "elliott.ns.cloudflare.com",
+          "hera.ns.cloudflare.com"
+        ],
+        "dnssec": true,
+        "source": "RDAP",
+        "age_days": 11387
+      },
+      "findings": [],
+      "error": null,
+      "duration_seconds": 1.13
+    },
+    {
+      "module": "hosting",
+      "title": "Hosting & network owner",
+      "source": "Team Cymru IP-to-ASN service (over DNS), reverse DNS",
+      "data": {
+        "hosts": [
+          {
+            "hostname": "example.com",
+            "ip": "104.20.23.154",
+            "reverse_dns": null,
+            "asn": "AS13335",
+            "network_owner": "CLOUDFLARENET - Cloudflare, Inc., US",
+            "prefix": "104.20.16.0/20",
+            "country": "US"
+          },
+          {
+            "hostname": "example.com",
+            "ip": "172.66.147.243",
+            "reverse_dns": null,
+            "asn": "AS13335",
+            "network_owner": "CLOUDFLARENET - Cloudflare, Inc., US",
+            "prefix": "172.66.144.0/20",
+            "country": "US"
+          },
+          {
+            "hostname": "example.com",
+            "ip": "2606:4700:10::ac42:93f3",
+            "reverse_dns": null,
+            "asn": "AS13335",
+            "network_owner": "CLOUDFLARENET - Cloudflare, Inc., US",
+            "prefix": "2606:4700:10::/44",
+            "country": "US"
+          },
+          {
+            "hostname": "example.com",
+            "ip": "2606:4700:10::6814:179a",
+            "reverse_dns": null,
+            "asn": "AS13335",
+            "network_owner": "CLOUDFLARENET - Cloudflare, Inc., US",
+            "prefix": "2606:4700:10::/44",
+            "country": "US"
+          },
+          {
+            "hostname": "www.example.com",
+            "ip": "172.66.147.243",
+            "reverse_dns": null,
+            "asn": "AS13335",
+            "network_owner": "CLOUDFLARENET - Cloudflare, Inc., US",
+            "prefix": "172.66.144.0/20",
+            "country": "US"
+          },
+          {
+            "hostname": "www.example.com",
+            "ip": "104.20.23.154",
+            "reverse_dns": null,
+            "asn": "AS13335",
+            "network_owner": "CLOUDFLARENET - Cloudflare, Inc., US",
+            "prefix": "104.20.16.0/20",
+            "country": "US"
+          },
+          {
+            "hostname": "www.example.com",
+            "ip": "2606:4700:10::6814:179a",
+            "reverse_dns": null,
+            "asn": "AS13335",
+            "network_owner": "CLOUDFLARENET - Cloudflare, Inc., US",
+            "prefix": "2606:4700:10::/44",
+            "country": "US"
+          },
+          {
+            "hostname": "www.example.com",
+            "ip": "2606:4700:10::ac42:93f3",
+            "reverse_dns": null,
+            "asn": "AS13335",
+            "network_owner": "CLOUDFLARENET - Cloudflare, Inc., US",
+            "prefix": "2606:4700:10::/44",
+            "country": "US"
+          }
+        ],
+        "providers": [
+          "Cloudflare"
+        ]
+      },
+      "findings": [
+        {
+          "severity": "info",
+          "title": "Network owner",
+          "detail": "CLOUDFLARENET - Cloudflare, Inc., US (AS13335, US)"
+        },
+        {
+          "severity": "info",
+          "title": "Served through a CDN (Cloudflare)",
+          "detail": "The real origin server IP is hidden behind the CDN."
+        }
+      ],
+      "error": null,
+      "duration_seconds": 1.02
+    },
+    {
+      "module": "email",
+      "title": "Email security (SPF, DKIM, DMARC)",
+      "source": "DNS",
+      "data": {
+        "spoofing_risk": "low",
+        "mx": [
+          "0 ."
+        ],
+        "providers": [],
+        "spf": [
+          "v=spf1 -all"
+        ],
+        "dmarc": [
+          "v=DMARC1;p=reject;sp=reject;adkim=s;aspf=s"
+        ],
+        "dmarc_policy": {
+          "v": "DMARC1",
+          "p": "reject",
+          "sp": "reject",
+          "adkim": "s",
+          "aspf": "s"
+        },
+        "dkim_selectors_found": []
+      },
+      "findings": [
+        {
+          "severity": "low",
+          "title": "No DMARC aggregate reports (rua)",
+          "detail": "The owner does not receive reports about who sends mail in the domain's name."
+        },
+        {
+          "severity": "info",
+          "title": "No DKIM key found on common selectors",
+          "detail": "Selectors can have any name, so this does not prove DKIM is missing."
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.45
+    },
+    {
+      "module": "tls",
+      "title": "TLS certificate",
+      "source": "One TLS handshake on port 443 (same as opening the site in a browser)",
+      "data": {
+        "host": "example.com",
+        "trusted": true,
+        "protocol": "TLSv1.3",
+        "cipher": "TLS_AES_256_GCM_SHA384",
+        "subject": "example.com",
+        "issuer": "SSL Corporation",
+        "valid_from": "2026-09-26T22:49:11+00:00",
+        "valid_until": "2026-12-25T22:56:35+00:00",
+        "names_on_certificate": [
+          "example.com",
+          "*.example.com"
+        ],
+        "days_left": 69
+      },
+      "findings": [
+        {
+          "severity": "info",
+          "title": "Issued by SSL Corporation",
+          "detail": "Valid for 69 more days."
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.32
+    },
+    {
+      "module": "http",
+      "title": "Website & security headers",
+      "source": "Homepage, /robots.txt and /.well-known/security.txt (like a normal visit)",
+      "data": {
+        "final_url": "https://example.com/",
+        "status_code": 200,
+        "redirect_chain": [],
+        "page_title": "Example Domain",
+        "http_redirects_to_https": false,
+        "technologies": [
+          "Cloudflare"
+        ],
+        "security_headers": {
+          "strict-transport-security": null,
+          "content-security-policy": null,
+          "x-content-type-options": null,
+          "referrer-policy": null,
+          "x-frame-options": null
+        },
+        "security_txt": false,
+        "robots_disallowed_paths": [],
+        "all_headers": {
+          "date": "Sat, 17 Oct 2026 07:37:37 GMT",
+          "content-type": "text/html; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "server": "cloudflare",
+          "last-modified": "Tue, 13 Oct 2026 22:05:48 GMT",
+          "allow": "GET, HEAD",
+          "age": "13970",
+          "cf-cache-status": "HIT",
+          "content-encoding": "gzip",
+          "cf-ray": "a4bda3994b7e760d-FRA",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "findings": [
+        {
+          "severity": "medium",
+          "title": "Missing HSTS header",
+          "detail": "Browsers may first connect over plain HTTP, which allows downgrade attacks."
+        },
+        {
+          "severity": "medium",
+          "title": "Missing Content-Security-Policy",
+          "detail": "No browser-level limit on where scripts can load from (XSS mitigation)."
+        },
+        {
+          "severity": "low",
+          "title": "Missing X-Content-Type-Options",
+          "detail": "Browsers may guess ('sniff') content types, which can turn uploads into scripts."
+        },
+        {
+          "severity": "low",
+          "title": "Missing Referrer-Policy",
+          "detail": "Full URLs, including tokens in them, may leak to other sites via the Referer header."
+        },
+        {
+          "severity": "low",
+          "title": "Page can be embedded in other sites (clickjacking)",
+          "detail": "Neither X-Frame-Options nor CSP frame-ancestors is set."
+        },
+        {
+          "severity": "medium",
+          "title": "HTTP does not redirect to HTTPS",
+          "detail": "http://example.com/ stays on plain HTTP."
+        },
+        {
+          "severity": "info",
+          "title": "No security.txt",
+          "detail": "There is no published way to report vulnerabilities (RFC 9116)."
+        }
+      ],
+      "error": null,
+      "duration_seconds": 1.14
+    },
+    {
+      "module": "subdomains",
+      "title": "Subdomains (Certificate Transparency)",
+      "source": "crt.sh, CertSpotter as fallback",
+      "data": {
+        "source_used": "crt.sh",
+        "total_found": 5,
+        "wildcard_dns": false,
+        "checked_in_dns": 5,
+        "live": 1,
+        "hosts": [
+          {
+            "name": "dev.example.com",
+            "ips": [],
+            "live": false,
+            "sensitive": true,
+            "dangling_cname": null
+          },
+          {
+            "name": "m.example.com",
+            "ips": [],
+            "live": false,
+            "sensitive": false,
+            "dangling_cname": null
+          },
+          {
+            "name": "products.example.com",
+            "ips": [],
+            "live": false,
+            "sensitive": false,
+            "dangling_cname": null
+          },
+          {
+            "name": "support.example.com",
+            "ips": [],
+            "live": false,
+            "sensitive": false,
+            "dangling_cname": null
+          },
+          {
+            "name": "www.example.com",
+            "ips": [
+              "172.66.147.243",
+              "104.20.23.154"
+            ],
+            "live": true,
+            "sensitive": false,
+            "dangling_cname": null
+          }
+        ],
+        "not_checked": []
+      },
+      "findings": [
+        {
+          "severity": "info",
+          "title": "5 subdomains found in Certificate Transparency logs",
+          "detail": "1 of the 5 checked still resolve to their own IP."
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.35
+    },
+    {
+      "module": "wayback",
+      "title": "Archived URLs (Wayback Machine)",
+      "source": "Internet Archive CDX API",
+      "data": {
+        "unique_urls": 5000,
+        "limit_reached": true,
+        "first_capture": "2002-01-20",
+        "top_file_types": {
+          "text/html": 4348,
+          "unk": 496,
+          "warc/revisit": 136,
+          "text/html,application/xhtml+xml,application/xml": 17,
+          "text/html,text/plain,text/xml,text/*,application/xml,application/xhtml+xml,application/rss+xml,application/atom+xml,application/rdf+xml,application/php,application/x-php,application/x-httpd-php": 3
+        },
+        "interesting_urls": [
+          "http://www.example.com/%80./boot.ini",
+          "http://example.com:80/%D0%9B%D0%B5%D1%87%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%BF%D1%80%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%B8%D1%82%D0%B0/wordpress/wp-admin/install.php",
+          "http://example.com:80/%D0%BB%D0%B5%D1%87%D0%B5%D0%BD%D0%B8%D0%B8%D0%B5%D0%BF%D1%80%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%B8%D1%82%D0%B0/wp-admin/install.php",
+          "http://example.com/%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0.zip",
+          "http://www.example.com/%D1%84%D0%B0%D0%B9%D0%BB.zip"
+        ]
+      },
+      "findings": [
+        {
+          "severity": "info",
+          "title": "5000+ unique URLs archived",
+          "detail": "First capture: 2002-01-20."
+        },
+        {
+          "severity": "medium",
+          "title": "Archived URLs with potentially sensitive paths (5)",
+          "detail": "They may no longer be live, but can reveal backups, configs or admin panels: http://www.example.com/%80./boot.ini, http://example.com:80/%D0%9B%D0%B5%D1%87%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%BF%D1%80%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%B8%D1%82%D0%B0/wordpress/wp-admin/install.php, http://example.com:80/%D0%BB%D0%B5%D1%87%D0%B5%D0%BD%D0%B8%D0%B8%D0%B5%D0%BF%D1%80%D0%BE%D1%81%D1%82%D0%B0%D1%82%D0%B8%D1%82%D0%B0/wp-admin/install.php, http://example.com/%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0.zip, http://www.example.com/%D1%84%D0%B0%D0%B9%D0%BB.zip"
+        }
+      ],
+      "error": null,
+      "duration_seconds": 16.76
+    },
+    {
+      "module": "typosquat",
+      "title": "Lookalike domains (typosquatting)",
+      "source": "Generated permutations, checked in DNS",
+      "data": {
+        "generated": 102,
+        "checked": 102,
+        "registered_count": 61,
+        "registered": [
+          {
+            "domain": "example.net",
+            "technique": "different TLD",
+            "ips": [
+              "104.20.21.8",
+              "172.66.175.59"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "example.org",
+            "technique": "different TLD",
+            "ips": [
+              "172.66.157.237",
+              "104.20.26.136"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "example.co",
+            "technique": "different TLD",
+            "ips": [
+              "172.67.143.199",
+              "104.21.39.76"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "example.io",
+            "technique": "different TLD",
+            "ips": [],
+            "can_receive_email": false
+          },
+          {
+            "domain": "example.eu",
+            "technique": "different TLD",
+            "ips": [
+              "81.2.196.19"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "example.sk",
+            "technique": "different TLD",
+            "ips": [
+              "81.2.241.7"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "example.cz",
+            "technique": "different TLD",
+            "ips": [],
+            "can_receive_email": true
+          },
+          {
+            "domain": "example.de",
+            "technique": "different TLD",
+            "ips": [
+              "217.160.0.248"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "example-account.com",
+            "technique": "added word",
+            "ips": [
+              "185.118.197.123"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "myexample.com",
+            "technique": "added word",
+            "ips": [
+              "199.168.103.236"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "secure-example.com",
+            "technique": "added word",
+            "ips": [
+              "38.6.118.133"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "ex4mple.com",
+            "technique": "lookalike character",
+            "ips": [],
+            "can_receive_email": false
+          },
+          {
+            "domain": "exarnple.com",
+            "technique": "lookalike character",
+            "ips": [
+              "149.120.153.85"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "examp1e.com",
+            "technique": "lookalike character",
+            "ips": [],
+            "can_receive_email": true
+          },
+          {
+            "domain": "exampie.com",
+            "technique": "lookalike character",
+            "ips": [
+              "103.224.182.245"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "exampl3.com",
+            "technique": "lookalike character",
+            "ips": [
+              "200.69.18.139"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "xample.com",
+            "technique": "missing letter",
+            "ips": [
+              "23.227.38.65"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "eample.com",
+            "technique": "missing letter",
+            "ips": [
+              "13.248.169.48",
+              "76.223.54.146"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "exmple.com",
+            "technique": "missing letter",
+            "ips": [
+              "67.210.233.131"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "exaple.com",
+            "technique": "missing letter",
+            "ips": [
+              "104.247.81.99"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "examle.com",
+            "technique": "missing letter",
+            "ips": [
+              "5.79.75.200"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "exampe.com",
+            "technique": "missing letter",
+            "ips": [
+              "172.239.194.227",
+              "172.238.172.116",
+              "172.239.194.117"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "exampl.com",
+            "technique": "missing letter",
+            "ips": [
+              "199.191.50.184"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "xeample.com",
+            "technique": "swapped letters",
+            "ips": [],
+            "can_receive_email": true
+          },
+          {
+            "domain": "eaxmple.com",
+            "technique": "swapped letters",
+            "ips": [
+              "157.7.236.66",
+              "202.181.103.212"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "exmaple.com",
+            "technique": "swapped letters",
+            "ips": [
+              "104.18.75.230",
+              "104.18.74.230"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "exapmle.com",
+            "technique": "swapped letters",
+            "ips": [
+              "103.224.182.243"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "examlpe.com",
+            "technique": "swapped letters",
+            "ips": [
+              "13.223.25.84",
+              "54.243.117.197"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "exampel.com",
+            "technique": "swapped letters",
+            "ips": [
+              "192.64.151.235"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "eexample.com",
+            "technique": "doubled letter",
+            "ips": [
+              "96.38.240.54"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "exxample.com",
+            "technique": "doubled letter",
+            "ips": [
+              "188.114.97.9",
+              "188.114.96.9"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "exaample.com",
+            "technique": "doubled letter",
+            "ips": [],
+            "can_receive_email": true
+          },
+          {
+            "domain": "exammple.com",
+            "technique": "doubled letter",
+            "ips": [
+              "13.223.25.84",
+              "54.243.117.197"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "exampple.com",
+            "technique": "doubled letter",
+            "ips": [
+              "3.33.130.190",
+              "15.197.148.33"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "examplle.com",
+            "technique": "doubled letter",
+            "ips": [
+              "104.21.25.153",
+              "172.67.134.87"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "examplee.com",
+            "technique": "doubled letter",
+            "ips": [
+              "162.248.211.18"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "wxample.com",
+            "technique": "keyboard typo",
+            "ips": [
+              "172.239.194.227",
+              "172.239.194.117",
+              "172.238.172.116"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "rxample.com",
+            "technique": "keyboard typo",
+            "ips": [
+              "13.223.25.84",
+              "54.243.117.197"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "ezample.com",
+            "technique": "keyboard typo",
+            "ips": [
+              "54.243.117.197",
+              "13.223.25.84"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "esample.com",
+            "technique": "keyboard typo",
+            "ips": [
+              "172.67.153.222",
+              "104.21.56.168"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "edample.com",
+            "technique": "keyboard typo",
+            "ips": [
+              "104.21.96.96",
+              "172.67.176.143"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "ecample.com",
+            "technique": "keyboard typo",
+            "ips": [
+              "104.21.83.125",
+              "172.67.175.216"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "exsmple.com",
+            "technique": "keyboard typo",
+            "ips": [
+              "54.243.117.197",
+              "13.223.25.84"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "exzmple.com",
+            "technique": "keyboard typo",
+            "ips": [],
+            "can_receive_email": true
+          },
+          {
+            "domain": "exanple.com",
+            "technique": "keyboard typo",
+            "ips": [
+              "172.67.128.140",
+              "104.21.1.52"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "examole.com",
+            "technique": "keyboard typo",
+            "ips": [
+              "172.239.194.227",
+              "172.239.194.117",
+              "172.238.172.116"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "exampke.com",
+            "technique": "keyboard typo",
+            "ips": [
+              "188.114.96.9",
+              "188.114.97.9"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "examplw.com",
+            "technique": "keyboard typo",
+            "ips": [
+              "103.224.212.235"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "examplr.com",
+            "technique": "keyboard typo",
+            "ips": [
+              "103.224.212.236"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "exampls.com",
+            "technique": "keyboard typo",
+            "ips": [],
+            "can_receive_email": false
+          },
+          {
+            "domain": "exampld.com",
+            "technique": "keyboard typo",
+            "ips": [
+              "207.207.210.36",
+              "207.207.210.23",
+              "207.207.210.50"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "e-xample.com",
+            "technique": "added hyphen",
+            "ips": [
+              "172.67.130.200",
+              "104.21.9.2"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "examp-le.com",
+            "technique": "added hyphen",
+            "ips": [
+              "172.237.159.210",
+              "172.234.27.224",
+              "172.239.193.217"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "wexample.com",
+            "technique": "extra key",
+            "ips": [
+              "151.80.23.108"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "rexample.com",
+            "technique": "extra key",
+            "ips": [
+              "54.243.117.197",
+              "13.223.25.84"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "sexample.com",
+            "technique": "extra key",
+            "ips": [
+              "76.223.54.146",
+              "13.248.169.48"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "dexample.com",
+            "technique": "extra key",
+            "ips": [
+              "185.143.234.132",
+              "185.143.233.132"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "esxample.com",
+            "technique": "extra key",
+            "ips": [],
+            "can_receive_email": true
+          },
+          {
+            "domain": "exsample.com",
+            "technique": "extra key",
+            "ips": [
+              "13.248.169.48",
+              "76.223.54.146"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "exzample.com",
+            "technique": "extra key",
+            "ips": [],
+            "can_receive_email": true
+          },
+          {
+            "domain": "exampole.com",
+            "technique": "extra key",
+            "ips": [
+              "3.33.130.190",
+              "15.197.148.33"
+            ],
+            "can_receive_email": false
+          }
+        ]
+      },
+      "findings": [
+        {
+          "severity": "low",
+          "title": "Registered lookalike domains: 61",
+          "detail": "Not necessarily malicious: many are parked or defensive registrations by the owner. Check who owns them: example.net, example.org, example.co, example.io, example.eu, example.sk, example.cz, example.de, example-account.com, myexample.com, secure-example.com, ex4mple.com ..."
+        },
+        {
+          "severity": "medium",
+          "title": "Lookalike domains that can receive email (32)",
+          "detail": "Mail-enabled lookalikes can be used for phishing or to catch mistyped emails: example.co, example.sk, example.cz, example.de, example-account.com, myexample.com, examp1e.com, exampie.com, exampl3.com, xample.com, exmple.com, exampe.com ..."
+        }
+      ],
+      "error": null,
+      "duration_seconds": 5.33
+    }
+  ]
+}

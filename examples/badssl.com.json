@@ -1,0 +1,456 @@
+{
+  "domain": "badssl.com",
+  "started_at": "2026-10-17T07:37:15+00:00",
+  "finished_at": "2026-10-17T07:37:35+00:00",
+  "tool_version": "0.1.0",
+  "results": [
+    {
+      "module": "dns",
+      "title": "DNS records",
+      "source": "System DNS resolver",
+      "data": {
+        "records": {
+          "A": [
+            "104.154.89.105"
+          ],
+          "AAAA": [],
+          "CNAME": [],
+          "MX": [
+            "10 alt1.gmr-smtp-in.l.google.com.",
+            "20 alt2.gmr-smtp-in.l.google.com.",
+            "40 alt4.gmr-smtp-in.l.google.com.",
+            "5 gmr-smtp-in.l.google.com.",
+            "30 alt3.gmr-smtp-in.l.google.com."
+          ],
+          "NS": [
+            "ns-cloud-c1.googledomains.com.",
+            "ns-cloud-c4.googledomains.com.",
+            "ns-cloud-c3.googledomains.com.",
+            "ns-cloud-c2.googledomains.com."
+          ],
+          "TXT": [
+            "_4wahjzefs6if6al9ai0ukockra7wb9c"
+          ],
+          "SOA": [
+            "ns-cloud-c1.googledomains.com. cloud-dns-hostmaster.google.com. 2 21600 3600 259200 300"
+          ],
+          "CAA": []
+        },
+        "services_from_txt": []
+      },
+      "findings": [
+        {
+          "severity": "low",
+          "title": "No CAA record",
+          "detail": "Any certificate authority may issue certificates for this domain. A CAA record restricts issuance to the CAs the owner actually uses."
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.4
+    },
+    {
+      "module": "registration",
+      "title": "Domain registration",
+      "source": "RDAP via rdap.org (WHOIS fallback)",
+      "data": {
+        "registrar": "MarkMonitor Inc.",
+        "created": "2015-04-07T22:09:30Z",
+        "expires": "2027-04-07T22:09:30Z",
+        "updated": "2026-03-06T10:32:49Z",
+        "status": [
+          "client delete prohibited",
+          "client transfer prohibited",
+          "client update prohibited"
+        ],
+        "nameservers": [
+          "ns-cloud-c1.googledomains.com",
+          "ns-cloud-c2.googledomains.com",
+          "ns-cloud-c3.googledomains.com",
+          "ns-cloud-c4.googledomains.com"
+        ],
+        "dnssec": false,
+        "source": "RDAP",
+        "age_days": 4210
+      },
+      "findings": [
+        {
+          "severity": "low",
+          "title": "DNSSEC is not enabled",
+          "detail": "DNS answers for this domain are not cryptographically signed."
+        }
+      ],
+      "error": null,
+      "duration_seconds": 1.09
+    },
+    {
+      "module": "hosting",
+      "title": "Hosting & network owner",
+      "source": "Team Cymru IP-to-ASN service (over DNS), reverse DNS",
+      "data": {
+        "hosts": [
+          {
+            "hostname": "badssl.com",
+            "ip": "104.154.89.105",
+            "reverse_dns": "105.89.154.104.bc.googleusercontent.com",
+            "asn": "AS396982",
+            "network_owner": "GOOGLE-CLOUD-PLATFORM - Google LLC, US",
+            "prefix": "104.154.80.0/20",
+            "country": "US"
+          },
+          {
+            "hostname": "www.badssl.com",
+            "ip": "104.154.89.105",
+            "reverse_dns": "105.89.154.104.bc.googleusercontent.com",
+            "asn": "AS396982",
+            "network_owner": "GOOGLE-CLOUD-PLATFORM - Google LLC, US",
+            "prefix": "104.154.80.0/20",
+            "country": "US"
+          }
+        ],
+        "providers": [
+          "Google Cloud"
+        ]
+      },
+      "findings": [
+        {
+          "severity": "info",
+          "title": "Network owner",
+          "detail": "GOOGLE-CLOUD-PLATFORM - Google LLC, US (AS396982, US)"
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.53
+    },
+    {
+      "module": "email",
+      "title": "Email security (SPF, DKIM, DMARC)",
+      "source": "DNS",
+      "data": {
+        "spoofing_risk": "high",
+        "mx": [
+          "10 alt1.gmr-smtp-in.l.google.com.",
+          "20 alt2.gmr-smtp-in.l.google.com.",
+          "40 alt4.gmr-smtp-in.l.google.com.",
+          "5 gmr-smtp-in.l.google.com.",
+          "30 alt3.gmr-smtp-in.l.google.com."
+        ],
+        "providers": [
+          "Google Workspace"
+        ],
+        "spf": [],
+        "dmarc": [],
+        "dmarc_policy": {},
+        "dkim_selectors_found": []
+      },
+      "findings": [
+        {
+          "severity": "high",
+          "title": "No SPF record",
+          "detail": "Receiving mail servers cannot check which servers may send mail for this domain."
+        },
+        {
+          "severity": "high",
+          "title": "No DMARC record",
+          "detail": "Receivers have no instructions for mail that fails SPF/DKIM, so the domain is easy to spoof in phishing emails."
+        },
+        {
+          "severity": "info",
+          "title": "No DKIM key found on common selectors",
+          "detail": "Selectors can have any name, so this does not prove DKIM is missing."
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.32
+    },
+    {
+      "module": "tls",
+      "title": "TLS certificate",
+      "source": "One TLS handshake on port 443 (same as opening the site in a browser)",
+      "data": {
+        "host": "badssl.com",
+        "trusted": true,
+        "protocol": "TLSv1.2",
+        "cipher": "ECDHE-RSA-AES128-GCM-SHA256",
+        "subject": "*.badssl.com",
+        "issuer": "Let's Encrypt",
+        "valid_from": "2026-09-29T20:02:56+00:00",
+        "valid_until": "2026-12-28T20:02:55+00:00",
+        "names_on_certificate": [
+          "*.badssl.com",
+          "badssl.com"
+        ],
+        "days_left": 72
+      },
+      "findings": [
+        {
+          "severity": "info",
+          "title": "Issued by Let's Encrypt",
+          "detail": "Valid for 72 more days."
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.62
+    },
+    {
+      "module": "http",
+      "title": "Website & security headers",
+      "source": "Homepage, /robots.txt and /.well-known/security.txt (like a normal visit)",
+      "data": {
+        "final_url": "https://badssl.com/",
+        "status_code": 200,
+        "redirect_chain": [],
+        "page_title": "badssl.com",
+        "http_redirects_to_https": true,
+        "technologies": [
+          "nginx/1.10.3 (Ubuntu)"
+        ],
+        "security_headers": {
+          "strict-transport-security": null,
+          "content-security-policy": null,
+          "x-content-type-options": null,
+          "referrer-policy": null,
+          "x-frame-options": null
+        },
+        "security_txt": false,
+        "robots_disallowed_paths": [],
+        "all_headers": {
+          "server": "nginx/1.10.3 (Ubuntu)",
+          "date": "Sat, 17 Oct 2026 07:37:16 GMT",
+          "content-type": "text/html",
+          "last-modified": "Tue, 13 Oct 2026 21:00:30 GMT",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "etag": "W/\"6ace9bee-2d99\"",
+          "cache-control": "no-store",
+          "content-encoding": "gzip"
+        }
+      },
+      "findings": [
+        {
+          "severity": "medium",
+          "title": "Missing HSTS header",
+          "detail": "Browsers may first connect over plain HTTP, which allows downgrade attacks."
+        },
+        {
+          "severity": "medium",
+          "title": "Missing Content-Security-Policy",
+          "detail": "No browser-level limit on where scripts can load from (XSS mitigation)."
+        },
+        {
+          "severity": "low",
+          "title": "Missing X-Content-Type-Options",
+          "detail": "Browsers may guess ('sniff') content types, which can turn uploads into scripts."
+        },
+        {
+          "severity": "low",
+          "title": "Missing Referrer-Policy",
+          "detail": "Full URLs, including tokens in them, may leak to other sites via the Referer header."
+        },
+        {
+          "severity": "low",
+          "title": "Page can be embedded in other sites (clickjacking)",
+          "detail": "Neither X-Frame-Options nor CSP frame-ancestors is set."
+        },
+        {
+          "severity": "low",
+          "title": "Software version disclosed in 'server' header",
+          "detail": "server: nginx/1.10.3 (Ubuntu) (helps attackers look up known vulnerabilities)"
+        },
+        {
+          "severity": "info",
+          "title": "No security.txt",
+          "detail": "There is no published way to report vulnerabilities (RFC 9116)."
+        }
+      ],
+      "error": null,
+      "duration_seconds": 1.88
+    },
+    {
+      "module": "subdomains",
+      "title": "Subdomains (Certificate Transparency)",
+      "source": "crt.sh, CertSpotter as fallback",
+      "data": {
+        "source_used": "CertSpotter",
+        "total_found": 1,
+        "wildcard_dns": [
+          "104.154.89.105"
+        ],
+        "checked_in_dns": 1,
+        "live": 0,
+        "hosts": [
+          {
+            "name": "revoked.badssl.com",
+            "ips": [
+              "104.154.89.105"
+            ],
+            "live": false,
+            "sensitive": false,
+            "dangling_cname": null
+          }
+        ],
+        "not_checked": []
+      },
+      "findings": [
+        {
+          "severity": "info",
+          "title": "1 subdomain found in Certificate Transparency logs",
+          "detail": "0 of the 1 checked still resolve to their own IP."
+        },
+        {
+          "severity": "info",
+          "title": "Wildcard DNS is enabled",
+          "detail": "Any subdomain resolves to 104.154.89.105. Hosts that only answer through the wildcard are not counted as live."
+        }
+      ],
+      "error": null,
+      "duration_seconds": 20.64
+    },
+    {
+      "module": "wayback",
+      "title": "Archived URLs (Wayback Machine)",
+      "source": "Internet Archive CDX API",
+      "data": {
+        "unique_urls": 1223,
+        "limit_reached": false,
+        "first_capture": "2015-05-02",
+        "top_file_types": {
+          "text/html": 765,
+          "image/png": 115,
+          "text/css": 83,
+          "image/x-icon": 82,
+          "warc/revisit": 78
+        },
+        "interesting_urls": [
+          "https://badssl.com/certs/badssl.com-client.p12",
+          "https://badssl.com/certs/badssl.com-client.pem",
+          "https://expired.badssl.com/download.zip",
+          "https://expired.badssl.com/fake.git",
+          "https://wrong.host.badssl.com/fake.git",
+          "https://self-signed.badssl.com/fake.git"
+        ]
+      },
+      "findings": [
+        {
+          "severity": "info",
+          "title": "1223 unique URLs archived",
+          "detail": "First capture: 2015-05-02."
+        },
+        {
+          "severity": "medium",
+          "title": "Archived URLs with potentially sensitive paths (6)",
+          "detail": "They may no longer be live, but can reveal backups, configs or admin panels: https://badssl.com/certs/badssl.com-client.p12, https://badssl.com/certs/badssl.com-client.pem, https://expired.badssl.com/download.zip, https://expired.badssl.com/fake.git, https://wrong.host.badssl.com/fake.git, https://self-signed.badssl.com/fake.git"
+        }
+      ],
+      "error": null,
+      "duration_seconds": 2.36
+    },
+    {
+      "module": "typosquat",
+      "title": "Lookalike domains (typosquatting)",
+      "source": "Generated permutations, checked in DNS",
+      "data": {
+        "generated": 105,
+        "checked": 105,
+        "registered_count": 9,
+        "registered": [
+          {
+            "domain": "badssl.xyz",
+            "technique": "different TLD",
+            "ips": [
+              "13.248.169.48",
+              "76.223.54.146"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "adssl.com",
+            "technique": "missing letter",
+            "ips": [
+              "217.76.142.172"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "bdssl.com",
+            "technique": "missing letter",
+            "ips": [
+              "164.109.18.82"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "bassl.com",
+            "technique": "missing letter",
+            "ips": [],
+            "can_receive_email": true
+          },
+          {
+            "domain": "badsl.com",
+            "technique": "missing letter",
+            "ips": [
+              "172.237.152.158",
+              "172.238.172.237",
+              "172.237.152.229"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "badss.com",
+            "technique": "missing letter",
+            "ips": [
+              "54.243.117.197",
+              "13.223.25.84"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "badasl.com",
+            "technique": "keyboard typo",
+            "ips": [
+              "154.204.254.180"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "badsal.com",
+            "technique": "keyboard typo",
+            "ips": [
+              "172.233.212.224",
+              "172.234.31.13",
+              "172.237.146.49",
+              "172.233.212.90",
+              "172.233.212.129",
+              "172.233.212.151"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "badsso.com",
+            "technique": "keyboard typo",
+            "ips": [
+              "185.199.110.153",
+              "185.199.108.153",
+              "185.199.109.153",
+              "185.199.111.153"
+            ],
+            "can_receive_email": false
+          }
+        ]
+      },
+      "findings": [
+        {
+          "severity": "low",
+          "title": "Registered lookalike domains: 9",
+          "detail": "Not necessarily malicious: many are parked or defensive registrations by the owner. Check who owns them: badssl.xyz, adssl.com, bdssl.com, bassl.com, badsl.com, badss.com, badasl.com, badsal.com, badsso.com"
+        },
+        {
+          "severity": "medium",
+          "title": "Lookalike domains that can receive email (5)",
+          "detail": "Mail-enabled lookalikes can be used for phishing or to catch mistyped emails: adssl.com, bdssl.com, bassl.com, badsl.com, badsal.com"
+        }
+      ],
+      "error": null,
+      "duration_seconds": 5.06
+    }
+  ]
+}

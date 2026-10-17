@@ -1,0 +1,39 @@
+{
+  "tool_version": "0.1.0",
+  "scanned_at": "2026-10-17T07:37:15+00:00",
+  "domains": [
+    {
+      "domain": "badssl.com",
+      "high": 2,
+      "medium": 4,
+      "low": 7,
+      "info": 7,
+      "email_spoofing_risk": "high",
+      "top_finding": "No SPF record",
+      "top_severity": "high",
+      "failed_modules": []
+    },
+    {
+      "domain": "httpbin.org",
+      "high": 0,
+      "medium": 5,
+      "low": 8,
+      "info": 6,
+      "email_spoofing_risk": "low",
+      "top_finding": "Missing HSTS header",
+      "top_severity": "medium",
+      "failed_modules": []
+    },
+    {
+      "domain": "example.com",
+      "high": 0,
+      "medium": 5,
+      "low": 6,
+      "info": 7,
+      "email_spoofing_risk": "low",
+      "top_finding": "Missing HSTS header",
+      "top_severity": "medium",
+      "failed_modules": []
+    }
+  ]
+}

@@ -1,0 +1,602 @@
+{
+  "domain": "httpbin.org",
+  "started_at": "2026-10-17T07:37:52+00:00",
+  "finished_at": "2026-10-17T07:38:09+00:00",
+  "tool_version": "0.1.0",
+  "results": [
+    {
+      "module": "dns",
+      "title": "DNS records",
+      "source": "System DNS resolver",
+      "data": {
+        "records": {
+          "A": [
+            "52.207.85.126",
+            "54.159.186.149",
+            "44.210.74.85",
+            "98.88.155.171",
+            "54.174.189.226",
+            "100.56.179.159",
+            "98.89.203.252",
+            "34.227.237.26"
+          ],
+          "AAAA": [],
+          "CNAME": [],
+          "MX": [],
+          "NS": [
+            "ns-1053.awsdns-03.org.",
+            "ns-1555.awsdns-02.co.uk.",
+            "ns-173.awsdns-21.com.",
+            "ns-884.awsdns-46.net."
+          ],
+          "TXT": [
+            "v=spf1 include:%{i}._ip.%{h}._ehlo.%{d}._spf.vali.email ~all"
+          ],
+          "SOA": [
+            "ns-1053.awsdns-03.org. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400"
+          ],
+          "CAA": [
+            "0 iodef \"mailto:security@postman.com\"",
+            "0 issue \"amazon.com\"",
+            "0 issue \"letsencrypt.org\"",
+            "0 issuewild \"amazon.com\""
+          ]
+        },
+        "services_from_txt": []
+      },
+      "findings": [],
+      "error": null,
+      "duration_seconds": 0.25
+    },
+    {
+      "module": "registration",
+      "title": "Domain registration",
+      "source": "RDAP via rdap.org (WHOIS fallback)",
+      "data": {
+        "registrar": "Amazon Registrar, Inc.",
+        "created": "2011-06-12T21:57:10.346Z",
+        "expires": "2027-06-12T21:57:10.346Z",
+        "updated": "2026-08-12T05:20:42.8Z",
+        "status": [
+          "client transfer prohibited"
+        ],
+        "nameservers": [
+          "ns-1053.awsdns-03.org",
+          "ns-1555.awsdns-02.co.uk",
+          "ns-173.awsdns-21.com",
+          "ns-884.awsdns-46.net"
+        ],
+        "dnssec": false,
+        "source": "RDAP",
+        "age_days": 5605
+      },
+      "findings": [
+        {
+          "severity": "low",
+          "title": "DNSSEC is not enabled",
+          "detail": "DNS answers for this domain are not cryptographically signed."
+        }
+      ],
+      "error": null,
+      "duration_seconds": 1.04
+    },
+    {
+      "module": "hosting",
+      "title": "Hosting & network owner",
+      "source": "Team Cymru IP-to-ASN service (over DNS), reverse DNS",
+      "data": {
+        "hosts": [
+          {
+            "hostname": "httpbin.org",
+            "ip": "98.88.155.171",
+            "reverse_dns": "ec2-98-88-155-171.compute-1.amazonaws.com",
+            "asn": "AS14618",
+            "network_owner": "AMAZON-AES - Amazon.com, Inc., US",
+            "prefix": "98.88.0.0/13",
+            "country": "US"
+          },
+          {
+            "hostname": "httpbin.org",
+            "ip": "54.174.189.226",
+            "reverse_dns": "ec2-54-174-189-226.compute-1.amazonaws.com",
+            "asn": "AS14618",
+            "network_owner": "AMAZON-AES - Amazon.com, Inc., US",
+            "prefix": "54.174.0.0/15",
+            "country": "US"
+          },
+          {
+            "hostname": "httpbin.org",
+            "ip": "100.56.179.159",
+            "reverse_dns": "ec2-100-56-179-159.compute-1.amazonaws.com",
+            "asn": "AS14618",
+            "network_owner": "AMAZON-AES - Amazon.com, Inc., US",
+            "prefix": "100.48.0.0/12",
+            "country": "US"
+          },
+          {
+            "hostname": "httpbin.org",
+            "ip": "98.89.203.252",
+            "reverse_dns": "ec2-98-89-203-252.compute-1.amazonaws.com",
+            "asn": "AS14618",
+            "network_owner": "AMAZON-AES - Amazon.com, Inc., US",
+            "prefix": "98.88.0.0/13",
+            "country": "US"
+          },
+          {
+            "hostname": "httpbin.org",
+            "ip": "34.227.237.26",
+            "reverse_dns": "ec2-34-227-237-26.compute-1.amazonaws.com",
+            "asn": "AS14618",
+            "network_owner": "AMAZON-AES - Amazon.com, Inc., US",
+            "prefix": "34.224.0.0/12",
+            "country": "US"
+          },
+          {
+            "hostname": "httpbin.org",
+            "ip": "52.207.85.126",
+            "reverse_dns": "ec2-52-207-85-126.compute-1.amazonaws.com",
+            "asn": "AS14618",
+            "network_owner": "AMAZON-AES - Amazon.com, Inc., US",
+            "prefix": "52.200.0.0/13",
+            "country": "US"
+          },
+          {
+            "hostname": "httpbin.org",
+            "ip": "54.159.186.149",
+            "reverse_dns": "ec2-54-159-186-149.compute-1.amazonaws.com",
+            "asn": "AS14618",
+            "network_owner": "AMAZON-AES - Amazon.com, Inc., US",
+            "prefix": "54.156.0.0/14",
+            "country": "US"
+          },
+          {
+            "hostname": "httpbin.org",
+            "ip": "44.210.74.85",
+            "reverse_dns": "ec2-44-210-74-85.compute-1.amazonaws.com",
+            "asn": "AS14618",
+            "network_owner": "AMAZON-AES - Amazon.com, Inc., US",
+            "prefix": "44.192.0.0/11",
+            "country": "US"
+          },
+          {
+            "hostname": "www.httpbin.org",
+            "ip": "3.225.83.162",
+            "reverse_dns": "ec2-3-225-83-162.compute-1.amazonaws.com",
+            "asn": "AS14618",
+            "network_owner": "AMAZON-AES - Amazon.com, Inc., US",
+            "prefix": "3.224.0.0/12",
+            "country": "US"
+          },
+          {
+            "hostname": "www.httpbin.org",
+            "ip": "44.210.74.85",
+            "reverse_dns": "ec2-44-210-74-85.compute-1.amazonaws.com",
+            "asn": "AS14618",
+            "network_owner": "AMAZON-AES - Amazon.com, Inc., US",
+            "prefix": "44.192.0.0/11",
+            "country": "US"
+          },
+          {
+            "hostname": "www.httpbin.org",
+            "ip": "52.207.85.126",
+            "reverse_dns": "ec2-52-207-85-126.compute-1.amazonaws.com",
+            "asn": "AS14618",
+            "network_owner": "AMAZON-AES - Amazon.com, Inc., US",
+            "prefix": "52.200.0.0/13",
+            "country": "US"
+          },
+          {
+            "hostname": "www.httpbin.org",
+            "ip": "54.174.189.226",
+            "reverse_dns": "ec2-54-174-189-226.compute-1.amazonaws.com",
+            "asn": "AS14618",
+            "network_owner": "AMAZON-AES - Amazon.com, Inc., US",
+            "prefix": "54.174.0.0/15",
+            "country": "US"
+          },
+          {
+            "hostname": "www.httpbin.org",
+            "ip": "98.88.155.171",
+            "reverse_dns": "ec2-98-88-155-171.compute-1.amazonaws.com",
+            "asn": "AS14618",
+            "network_owner": "AMAZON-AES - Amazon.com, Inc., US",
+            "prefix": "98.88.0.0/13",
+            "country": "US"
+          },
+          {
+            "hostname": "www.httpbin.org",
+            "ip": "52.21.224.34",
+            "reverse_dns": "ec2-52-21-224-34.compute-1.amazonaws.com",
+            "asn": "AS14618",
+            "network_owner": "AMAZON-AES - Amazon.com, Inc., US",
+            "prefix": "52.20.0.0/14",
+            "country": "US"
+          },
+          {
+            "hostname": "www.httpbin.org",
+            "ip": "54.159.186.149",
+            "reverse_dns": "ec2-54-159-186-149.compute-1.amazonaws.com",
+            "asn": "AS14618",
+            "network_owner": "AMAZON-AES - Amazon.com, Inc., US",
+            "prefix": "54.156.0.0/14",
+            "country": "US"
+          },
+          {
+            "hostname": "www.httpbin.org",
+            "ip": "100.56.179.159",
+            "reverse_dns": "ec2-100-56-179-159.compute-1.amazonaws.com",
+            "asn": "AS14618",
+            "network_owner": "AMAZON-AES - Amazon.com, Inc., US",
+            "prefix": "100.48.0.0/12",
+            "country": "US"
+          }
+        ],
+        "providers": [
+          "Amazon Web Services"
+        ]
+      },
+      "findings": [
+        {
+          "severity": "info",
+          "title": "Network owner",
+          "detail": "AMAZON-AES - Amazon.com, Inc., US (AS14618, US)"
+        }
+      ],
+      "error": null,
+      "duration_seconds": 2.52
+    },
+    {
+      "module": "email",
+      "title": "Email security (SPF, DKIM, DMARC)",
+      "source": "DNS",
+      "data": {
+        "spoofing_risk": "low",
+        "mx": [],
+        "providers": [],
+        "spf": [
+          "v=spf1 include:%{i}._ip.%{h}._ehlo.%{d}._spf.vali.email ~all"
+        ],
+        "dmarc": [
+          "v=DMARC1; p=quarantine; pct=100; rua=mailto:dmarc_agg@vali.email"
+        ],
+        "dmarc_policy": {
+          "v": "DMARC1",
+          "p": "quarantine",
+          "pct": "100",
+          "rua": "mailto:dmarc_agg@vali.email"
+        },
+        "dkim_selectors_found": []
+      },
+      "findings": [
+        {
+          "severity": "low",
+          "title": "SPF policy is soft-fail (~all)",
+          "detail": "Spoofed mail is usually still delivered, often to spam. '-all' is stricter."
+        },
+        {
+          "severity": "low",
+          "title": "DMARC policy is 'quarantine'",
+          "detail": "Spoofed mail goes to spam. 'reject' blocks it."
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.37
+    },
+    {
+      "module": "tls",
+      "title": "TLS certificate",
+      "source": "One TLS handshake on port 443 (same as opening the site in a browser)",
+      "data": {
+        "host": "httpbin.org",
+        "trusted": true,
+        "protocol": "TLSv1.2",
+        "cipher": "ECDHE-RSA-AES128-GCM-SHA256",
+        "subject": "httpbin.org",
+        "issuer": "Amazon",
+        "valid_from": "2026-06-19T00:00:00+00:00",
+        "valid_until": "2027-01-02T23:59:59+00:00",
+        "names_on_certificate": [
+          "httpbin.org",
+          "*.httpbin.org"
+        ],
+        "days_left": 77
+      },
+      "findings": [
+        {
+          "severity": "info",
+          "title": "Issued by Amazon",
+          "detail": "Valid for 77 more days."
+        }
+      ],
+      "error": null,
+      "duration_seconds": 0.45
+    },
+    {
+      "module": "http",
+      "title": "Website & security headers",
+      "source": "Homepage, /robots.txt and /.well-known/security.txt (like a normal visit)",
+      "data": {
+        "final_url": "https://httpbin.org/",
+        "status_code": 200,
+        "redirect_chain": [],
+        "page_title": "httpbin.org",
+        "http_redirects_to_https": false,
+        "technologies": [
+          "gunicorn/19.9.0"
+        ],
+        "security_headers": {
+          "strict-transport-security": null,
+          "content-security-policy": null,
+          "x-content-type-options": null,
+          "referrer-policy": null,
+          "x-frame-options": null
+        },
+        "security_txt": false,
+        "robots_disallowed_paths": [
+          "/deny"
+        ],
+        "all_headers": {
+          "date": "Sat, 17 Oct 2026 07:37:54 GMT",
+          "content-type": "text/html; charset=utf-8",
+          "content-length": "9593",
+          "connection": "keep-alive",
+          "server": "gunicorn/19.9.0",
+          "access-control-allow-origin": "*",
+          "access-control-allow-credentials": "true"
+        }
+      },
+      "findings": [
+        {
+          "severity": "medium",
+          "title": "Missing HSTS header",
+          "detail": "Browsers may first connect over plain HTTP, which allows downgrade attacks."
+        },
+        {
+          "severity": "medium",
+          "title": "Missing Content-Security-Policy",
+          "detail": "No browser-level limit on where scripts can load from (XSS mitigation)."
+        },
+        {
+          "severity": "low",
+          "title": "Missing X-Content-Type-Options",
+          "detail": "Browsers may guess ('sniff') content types, which can turn uploads into scripts."
+        },
+        {
+          "severity": "low",
+          "title": "Missing Referrer-Policy",
+          "detail": "Full URLs, including tokens in them, may leak to other sites via the Referer header."
+        },
+        {
+          "severity": "low",
+          "title": "Page can be embedded in other sites (clickjacking)",
+          "detail": "Neither X-Frame-Options nor CSP frame-ancestors is set."
+        },
+        {
+          "severity": "low",
+          "title": "Software version disclosed in 'server' header",
+          "detail": "server: gunicorn/19.9.0 (helps attackers look up known vulnerabilities)"
+        },
+        {
+          "severity": "medium",
+          "title": "HTTP does not redirect to HTTPS",
+          "detail": "http://httpbin.org/ stays on plain HTTP."
+        },
+        {
+          "severity": "info",
+          "title": "No security.txt",
+          "detail": "There is no published way to report vulnerabilities (RFC 9116)."
+        },
+        {
+          "severity": "info",
+          "title": "robots.txt hides 1 paths from search engines",
+          "detail": "/deny"
+        }
+      ],
+      "error": null,
+      "duration_seconds": 1.83
+    },
+    {
+      "module": "subdomains",
+      "title": "Subdomains (Certificate Transparency)",
+      "source": "crt.sh, CertSpotter as fallback",
+      "data": {
+        "source_used": "crt.sh",
+        "total_found": 5,
+        "wildcard_dns": false,
+        "checked_in_dns": 5,
+        "live": 2,
+        "hosts": [
+          {
+            "name": "eu.httpbin.org",
+            "ips": [
+              "98.88.155.171",
+              "52.207.85.126",
+              "44.210.74.85",
+              "52.21.224.34",
+              "54.174.189.226",
+              "100.56.179.159",
+              "54.159.186.149",
+              "34.227.237.26"
+            ],
+            "live": true,
+            "sensitive": false,
+            "dangling_cname": null
+          },
+          {
+            "name": "now.httpbin.org",
+            "ips": [],
+            "live": false,
+            "sensitive": false,
+            "dangling_cname": null
+          },
+          {
+            "name": "staging.httpbin.org",
+            "ips": [],
+            "live": false,
+            "sensitive": true,
+            "dangling_cname": null
+          },
+          {
+            "name": "test.httpbin.org",
+            "ips": [],
+            "live": false,
+            "sensitive": true,
+            "dangling_cname": null
+          },
+          {
+            "name": "www.httpbin.org",
+            "ips": [
+              "3.225.83.162",
+              "44.210.74.85",
+              "52.207.85.126",
+              "54.174.189.226",
+              "98.88.155.171",
+              "52.21.224.34",
+              "54.159.186.149",
+              "100.56.179.159"
+            ],
+            "live": true,
+            "sensitive": false,
+            "dangling_cname": null
+          }
+        ],
+        "not_checked": []
+      },
+      "findings": [
+        {
+          "severity": "info",
+          "title": "5 subdomains found in Certificate Transparency logs",
+          "detail": "2 of the 5 checked still resolve to their own IP."
+        }
+      ],
+      "error": null,
+      "duration_seconds": 16.05
+    },
+    {
+      "module": "wayback",
+      "title": "Archived URLs (Wayback Machine)",
+      "source": "Internet Archive CDX API",
+      "data": {
+        "unique_urls": 5000,
+        "limit_reached": true,
+        "first_capture": "2011-06-16",
+        "top_file_types": {
+          "text/html": 3389,
+          "application/json": 1224,
+          "warc/revisit": 233,
+          "application/octet-stream": 61,
+          "unk": 51
+        },
+        "interesting_urls": [
+          "http://httpbin.org:80/admin",
+          "http://httpbin.org:80/basic-auth/admin/1234",
+          "https://httpbin.org/basic-auth/admin/admin",
+          "http://www.httpbin.org/basic-auth/admin/adminpwd",
+          "https://httpbin.org/basic-auth/admin/secret",
+          "https://httpbin.org/basic-auth/admin/secret%5C",
+          "http://httpbin.org/debug?url="
+        ]
+      },
+      "findings": [
+        {
+          "severity": "info",
+          "title": "5000+ unique URLs archived",
+          "detail": "First capture: 2011-06-16."
+        },
+        {
+          "severity": "medium",
+          "title": "Archived URLs with potentially sensitive paths (7)",
+          "detail": "They may no longer be live, but can reveal backups, configs or admin panels: http://httpbin.org:80/admin, http://httpbin.org:80/basic-auth/admin/1234, https://httpbin.org/basic-auth/admin/admin, http://www.httpbin.org/basic-auth/admin/adminpwd, https://httpbin.org/basic-auth/admin/secret, https://httpbin.org/basic-auth/admin/secret%5C, http://httpbin.org/debug?url="
+        }
+      ],
+      "error": null,
+      "duration_seconds": 2.27
+    },
+    {
+      "module": "typosquat",
+      "title": "Lookalike domains (typosquatting)",
+      "source": "Generated permutations, checked in DNS",
+      "data": {
+        "generated": 104,
+        "checked": 104,
+        "registered_count": 7,
+        "registered": [
+          {
+            "domain": "httpbin.com",
+            "technique": "different TLD",
+            "ips": [
+              "172.67.144.64",
+              "104.21.28.50"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "httpbin.net",
+            "technique": "different TLD",
+            "ips": [
+              "76.223.54.146",
+              "13.248.169.48"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "httpbin.info",
+            "technique": "different TLD",
+            "ips": [
+              "172.67.202.63",
+              "104.21.90.154"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "httpbin.co",
+            "technique": "different TLD",
+            "ips": [
+              "104.21.18.182",
+              "172.67.183.27"
+            ],
+            "can_receive_email": true
+          },
+          {
+            "domain": "httpbin.io",
+            "technique": "different TLD",
+            "ips": [
+              "44.211.11.205",
+              "52.70.33.41",
+              "3.224.228.208"
+            ],
+            "can_receive_email": false
+          },
+          {
+            "domain": "httpbin.app",
+            "technique": "different TLD",
+            "ips": [],
+            "can_receive_email": false
+          },
+          {
+            "domain": "httbin.org",
+            "technique": "missing letter",
+            "ips": [
+              "104.247.81.99"
+            ],
+            "can_receive_email": false
+          }
+        ]
+      },
+      "findings": [
+        {
+          "severity": "low",
+          "title": "Registered lookalike domains: 7",
+          "detail": "Not necessarily malicious: many are parked or defensive registrations by the owner. Check who owns them: httpbin.com, httpbin.net, httpbin.info, httpbin.co, httpbin.io, httpbin.app, httbin.org"
+        },
+        {
+          "severity": "medium",
+          "title": "Lookalike domains that can receive email (1)",
+          "detail": "Mail-enabled lookalikes can be used for phishing or to catch mistyped emails: httpbin.co"
+        }
+      ],
+      "error": null,
+      "duration_seconds": 5.18
+    }
+  ]
+}

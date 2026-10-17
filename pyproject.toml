@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "domain-recon"
+dynamic = ["version"]
+description = "Passive OSINT reconnaissance for any domain, or a whole list of them, in dark HTML reports."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["osint", "recon", "security", "dns", "certificate-transparency", "threat-intelligence"]
+dependencies = [
+    "dnspython>=2.4",
+    "Jinja2>=3.1",
+    "requests>=2.31",
+    "tldextract>=5.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+[project.scripts]
+domain-recon = "domain_recon.cli:main"
+
+[project.urls]
+Repository = "https://github.com/skriptkiddy98x/domain-recon"
+
+[tool.setuptools.dynamic]
+version = { attr = "domain_recon.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["domain_recon*"]
+
+[tool.setuptools.package-data]
+domain_recon = ["templates/*.html", "templates/*.css"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
